@@ -27,7 +27,7 @@ html,body{height:100%;background:linear-gradient(180deg,#030406,#07080b);font-fa
     <div class="header">
       <div>
         <div class="title">Crionic Dashboard • NestEx</div>
-        <div class="sub">Privátne info z NestEx (balances, orders) — server-side proxy, kľúče na serveri</div>
+        <div class="sub">Privátne info z NestEx (balances, orders) — proxy na serveri</div>
       </div>
       <div>
         <button id="btnRefresh" class="btn">Manual refresh</button>
@@ -54,19 +54,10 @@ html,body{height:100%;background:linear-gradient(180deg,#030406,#07080b);font-fa
       </div>
     </div>
 
-    <div class="footer">Dbaj na bezpečnosť: API KEY/SECRET NEVKLADAJ do frontend kódu ani do repozitára.</div>
+    <div class="footer">Dbaj na bezpečnosť: API KEY/SECRET sú len na serveri (Render env vars)</div>
   </div>
 
 <script>
-/*
-  index.html - calls server endpoints:
-   POST /api/nestex/checktoken
-   POST /api/nestex/balances
-   POST /api/nestex/orders
-
-  Server enforces 5s minimum gap. Frontend polls every 6s to be safe.
-*/
-
 const cfg = { pollInterval: 6000, apiBase: '/api/nestex' };
 
 function log(msg){ const el=document.getElementById('logArea'); el.textContent = new Date().toISOString() + ' ' + msg + '\n' + el.textContent; }
@@ -85,34 +76,31 @@ async function postJson(path, body = {}) {
 async function updateAll() {
   setStatus('updating...');
   try{
-    // check token first
     const chk = await postJson('/checktoken');
     if (chk.status === 200) {
       setStatus('token ok');
       log('checktoken ok');
     } else {
-      setStatus('token invalid or error');
-      log('checktoken status ' + chk.status + ' ' + JSON.stringify(chk.data));
+      setStatus('token invalid');
+      log('checktoken fail ' + JSON.stringify(chk.data));
     }
 
-    // balances
     const bal = await postJson('/balances');
     if (bal.status === 200) {
       renderBalances(bal.data);
       log('balances fetched');
     } else {
-      document.getElementById('balancesArea').textContent = 'Error: ' + bal.status;
-      log('balances error: ' + JSON.stringify(bal.data));
+      document.getElementById('balancesArea').textContent = 'Error ' + bal.status;
+      log('balances error ' + JSON.stringify(bal.data));
     }
 
-    // orders
     const ord = await postJson('/orders');
     if (ord.status === 200) {
       renderOrders(ord.data);
       log('orders fetched');
     } else {
-      document.getElementById('ordersArea').textContent = 'Error: ' + ord.status;
-      log('orders error: ' + JSON.stringify(ord.data));
+      document.getElementById('ordersArea').textContent = 'Error ' + ord.status;
+      log('orders error ' + JSON.stringify(ord.data));
     }
 
   } catch (e) {
@@ -124,7 +112,6 @@ async function updateAll() {
 }
 
 function renderBalances(data){
-  // expected data: { balances: {...}, locked: {...}, success: "ok" }
   if(!data || !data.balances){ document.getElementById('balancesArea').textContent = JSON.stringify(data); return; }
   const b = data.balances;
   const l = data.locked || {};
@@ -133,15 +120,12 @@ function renderBalances(data){
 }
 
 function renderOrders(data){
-  // expected data: { orders: [ ... ], success: "ok" }
   if(!data || !Array.isArray(data.orders)){ document.getElementById('ordersArea').textContent = JSON.stringify(data); return; }
   const rows = data.orders.map(o => `#${o.order_id} ${o.cur} ${o.order_type} ${o.quantity} @ ${o.price} (${o.status})`);
   document.getElementById('ordersArea').textContent = rows.length ? rows.join('\n') : 'No open orders';
 }
 
-// manual refresh button
 document.getElementById('btnRefresh').addEventListener('click', ()=>{ updateAll(); });
-
 updateAll();
 setInterval(updateAll, cfg.pollInterval);
 </script>
