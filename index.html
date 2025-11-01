@@ -3,108 +3,152 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Crionic Live Dashboard</title>
+<title>Crionic • CoinPaprika Dashboard</title>
 <style>
-  :root{--bg:#050608;--panel:rgba(255,255,255,0.04);--neon-a:#00ffd5;--neon-b:#7b61ff;--accent:#7be495;--text:#cfeee8;--muted:#94a3b8;}
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;background:#040506;font-family:Inter,system-ui;color:var(--text)}
-  .wrap{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:18px;padding:22px}
-  .card{background:rgba(255,255,255,0.04);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:14px;position:relative;overflow:hidden}
-  h3{font-size:14px;color:var(--accent);margin-bottom:8px}
-  .row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.05)}
-  .bar{height:10px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden}
-  .bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));transition:width .8s}
-  .btn{padding:6px 10px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;cursor:pointer;background:rgba(255,255,255,0.05);font-size:12px}
-  .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.08);border-top-color:var(--neon-a);border-radius:50%;animation:spin 1s linear infinite;display:inline-block}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:12px}
-  @media(max-width:980px){.wrap{grid-template-columns:1fr}}
+:root{--bg:#050608;--neon-a:#00ffd5;--neon-b:#7b61ff;--text:#cfeee8;--muted:#94a3b8;--accent:#7be495}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(180deg,#030406,#07080b);font-family:Inter,system-ui,Arial;color:var(--text)}
+.container{padding:20px;max-width:1200px;margin:0 auto}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.title{font-weight:800;color:var(--neon-a);font-size:20px}
+.sub{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:rgba(255,255,255,0.03);backdrop-filter:blur(8px);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.04);position:relative;overflow:hidden}
+.h3{font-size:13px;color:var(--accent);margin-bottom:8px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
+.row:last-child{border-bottom:0}
+.val{font-weight:700}
+.muted{color:var(--muted);font-size:13px}
+.btn{padding:7px 10px;border-radius:10px;background:linear-gradient(90deg,var(--neon-b),var(--neon-a));color:#041018;font-weight:700;text-decoration:none;border:none;cursor:pointer}
+.bar{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));transition:width .9s}
+.log{font-family:monospace;color:var(--muted);font-size:12px;max-height:220px;overflow:auto;padding:8px;background:rgba(0,0,0,0.2);border-radius:8px}
+.footer{margin-top:14px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div style="padding:14px 22px 0 22px;display:flex;justify-content:space-between;align-items:center;">
-  <div style="font-weight:800;font-size:18px;color:var(--neon-a)">Crionic Dashboard</div>
-  <div><span id="autoSpin"></span><span id="lastFetch">—</span></div>
-</div>
+  <div class="container">
+    <div class="header">
+      <div>
+        <div class="title">Crionic Dashboard</div>
+        <div class="sub">Pripojené len na CoinPaprika • live market data</div>
+      </div>
+      <div>
+        <button id="btnRefresh" class="btn">Manual refresh</button>
+      </div>
+    </div>
 
-<main class="wrap">
-  <section class="card">
-    <h3>Network</h3>
-    <div class="row"><div>Hashrate</div><div id="val_hash">—</div></div>
-    <div class="bar"><i id="bar_hash"></i></div>
-    <div class="row"><div>Difficulty</div><div id="val_diff">—</div></div>
-    <div class="bar"><i id="bar_diff"></i></div>
-    <div class="row"><div>Connections</div><div id="val_conn">—</div></div>
-    <div class="bar"><i id="bar_conn"></i></div>
-  </section>
+    <div class="grid">
+      <div class="card">
+        <div class="h3">Market (CoinPaprika) — CRNC</div>
+        <div class="row"><div class="muted">Cena (USD)</div><div id="price" class="val">—</div></div>
+        <div class="row"><div class="muted">24h Zmena</div><div id="percent" class="val">—</div></div>
+        <div class="row"><div class="muted">Market Cap</div><div id="mcap" class="val">—</div></div>
+        <div class="row"><div class="muted">Obchodný objem 24h</div><div id="vol" class="val">—</div></div>
+        <div style="margin-top:10px" class="row"><div class="muted">Supply</div><div id="supply" class="val">—</div></div>
+      </div>
 
-  <section class="card">
-    <h3>Market</h3>
-    <div class="row"><div>CoinPaprika</div><div id="cp_price">—</div></div>
-  </section>
+      <div class="card">
+        <div class="h3">Price Spark</div>
+        <div style="padding:8px 0">
+          <div class="bar"><i id="priceBar"></i></div>
+        </div>
+        <div style="margin-top:12px" class="muted">Last updated: <span id="lastUpdated">—</span></div>
+        <div style="margin-top:12px">
+          <a class="btn" id="cpLink" href="https://coinpaprika.com/coin/crnc-crionic/" target="_blank">Open on CoinPaprika</a>
+        </div>
+      </div>
 
-  <section class="card">
-    <h3>Pools</h3>
-    <div class="row"><div>coin-miners.info</div><div id="cm_status">—</div></div>
-  </section>
+      <div class="card">
+        <div class="h3">Quick Logs</div>
+        <div id="logArea" class="log">—</div>
+      </div>
 
-  <section class="card" style="grid-column:span 3;">
-    <h3>Logs</h3>
-    <pre id="logArea" style="font-family:monospace;font-size:12px;color:var(--muted);max-height:300px;overflow:auto;">—</pre>
-  </section>
-</main>
+      <div class="card" style="grid-column:span 3">
+        <div class="h3">Notes & links</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a class="btn" href="https://github.com/diabaths/Crionic-Coin/releases" target="_blank">Crionic Wallet</a>
+          <a class="btn" href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">SRB Miner</a>
+          <a class="btn" href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex CRNC/USDT</a>
+        </div>
+      </div>
+    </div>
 
-<footer>Crionic Dashboard • realtime proxy mode</footer>
+    <div class="footer">Dashboard beží cez proxy • verejné nasadenie: hostni server.js (Render/Vercel/VPS)</div>
+  </div>
 
 <script>
-const cfg={
-  explorerBase:'/proxy?url=https://explorer.crionic.org',
-  poolBase:'/proxy?url=https://pool.coin-miners.info',
-  coinpaprika:'/proxy?url=https://api.coinpaprika.com/v1/tickers/crnc-crionic',
-  fast:1000,slow:10000,timeout:6000
+/* FULL file code: only CoinPaprika used. Proxy required for public hosting. */
+const cfg = {
+  coinpaprika: '/proxy?url=https://api.coinpaprika.com/v1/tickers/crnc-crionic',
+  fastInterval: 1000,
+  slowInterval: 10000,
+  fetchTimeout: 6000
 };
 
-function log(m){const e=document.getElementById('logArea');e.textContent=new Date().toISOString()+" "+m+"\n"+e.textContent;}
-function setBar(id,p){const e=document.getElementById(id);if(e)e.style.width=Math.max(0,Math.min(100,p))+"%";}
-function setSpin(on){const s=document.getElementById("autoSpin"),t=document.getElementById("lastFetch");if(on)s.innerHTML='<span class="spinner"></span>';else{s.innerHTML='';t.textContent=new Date().toLocaleTimeString();}}
-function human(n){if(!n)return'—';let u=['','K','M','G','T'],i=0;while(n>=1000&&i<u.length-1){n/=1000;i++;}return n.toFixed(2)+u[i];}
+function log(msg){ const el=document.getElementById('logArea'); el.textContent = new Date().toISOString() + '  ' + msg + '\n' + el.textContent; }
+function setBar(p){ const e=document.getElementById('priceBar'); e.style.width = Math.max(0, Math.min(100, p)) + '%'; }
+function fmt(n){ if(!n && n!==0) return '—'; if(n>=1000000) return (n/1000000).toFixed(2)+'M'; if(n>=1000) return (n/1000).toFixed(2)+'K'; return Number(n).toFixed(6); }
 
-async function fetchAuto(url){
-  const r=await fetch(url);
-  const type=r.headers.get('content-type')||'';
-  if(type.includes('application/json'))return r.json();
-  const t=await r.text();
-  try{return JSON.parse(t);}catch{return t;}
-}
-
-async function updateFast(){
-  setSpin(true);
+async function fetchWithTimeout(url, timeout = cfg.fetchTimeout){
+  const controller = new AbortController();
+  const id = setTimeout(()=>controller.abort(), timeout);
   try{
-    const h=await fetchAuto(cfg.explorerBase+'/api/getnetworkhashps');
-    document.getElementById('val_hash').textContent=human(Number(h));setBar('bar_hash',70);
-    const d=await fetchAuto(cfg.explorerBase+'/api/getdifficulty');
-    document.getElementById('val_diff').textContent=Number(d).toFixed(2);setBar('bar_diff',40);
-    const c=await fetchAuto(cfg.explorerBase+'/api/getconnectioncount');
-    document.getElementById('val_conn').textContent=c;setBar('bar_conn',Math.min(100,(c/200)*100));
-    const m=await fetchAuto(cfg.coinpaprika);
-    const p=m?.quotes?.USD?.price||m?.price_usd||0;
-    document.getElementById('cp_price').textContent=p?'$'+p.toFixed(6):'—';
-  }catch(e){log('Fast update: '+e.message);}
-  setSpin(false);
+    const res = await fetch(url, {signal: controller.signal});
+    clearTimeout(id);
+    const ct = res.headers.get('content-type')||'';
+    if(ct.includes('application/json')) return await res.json();
+    const text = await res.text();
+    try{ return JSON.parse(text); } catch { return text; }
+  }catch(e){
+    clearTimeout(id);
+    throw e;
+  }
 }
 
-async function updateSlow(){
+async function updateMarket(){
   try{
-    const pool=await fetchAuto(cfg.poolBase+'/api/status');
-    if(pool)document.getElementById('cm_status').textContent='online';
-    else document.getElementById('cm_status').textContent='offline';
-  }catch(e){document.getElementById('cm_status').textContent='offline';log('Pool: '+e.message);}
+    const data = await fetchWithTimeout(cfg.coinpaprika);
+    if(!data){ log('coinpaprika: no data'); return; }
+    // coinpaprika ticker structure:
+    // price_usd or quotes.USD.price
+    const price = data?.quotes?.USD?.price ?? data?.price_usd ?? null;
+    const percent = data?.quotes?.USD?.percent_change_24h ?? data?.percent_change_24h ?? null;
+    const mcap = data?.market_cap ?? (data?.quotes?.USD?.market_cap ?? null);
+    const vol = data?.volume_24h ?? (data?.quotes?.USD?.volume_24h ?? null);
+    const supply = data?.circulating_supply ?? data?.circulating_supply;
+
+    document.getElementById('price').textContent = price ? '$' + Number(price).toFixed(6) : '—';
+    document.getElementById('percent').textContent = percent !== null ? (Number(percent).toFixed(2) + '%') : '—';
+    document.getElementById('mcap').textContent = mcap ? '$' + (mcap >= 1e9 ? (mcap/1e9).toFixed(2)+'B' : (mcap>=1e6 ? (mcap/1e6).toFixed(2)+'M' : Number(mcap).toFixed(2))) : '—';
+    document.getElementById('vol').textContent = vol ? '$' + fmt(vol) : '—';
+    document.getElementById('supply').textContent = supply ? Number(supply).toLocaleString() : '—';
+
+    // simple price-based bar: scale price into 0-100 using sliding window heuristic
+    // we compute a moving window between minPriceSeen..maxPriceSeen in this session
+    updateMarket.min = updateMarket.min ?? Number(price) ?? 0;
+    updateMarket.max = updateMarket.max ?? Number(price) ?? 0;
+    const pnum = Number(price) || 0;
+    if(pnum < updateMarket.min) updateMarket.min = pnum;
+    if(pnum > updateMarket.max) updateMarket.max = pnum;
+    const range = (updateMarket.max - updateMarket.min) || 1;
+    const pct = ((pnum - updateMarket.min) / range) * 100;
+    setBar(pct);
+
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+    log('coinpaprika fetched: price ' + (price ? '$'+Number(price).toFixed(6) : '—'));
+  }catch(e){
+    log('coinpaprika error: ' + (e.message || e));
+    document.getElementById('price').textContent = '—';
+  }
 }
 
-updateFast();updateSlow();
-setInterval(updateFast,cfg.fast);
-setInterval(updateSlow,cfg.slow);
-log('dashboard started with fixed proxy order');
+// manual refresh button
+document.getElementById('btnRefresh').addEventListener('click', ()=>{ updateMarket(); });
+
+updateMarket();
+setInterval(updateMarket, cfg.fastInterval);
 </script>
 </body>
 </html>
