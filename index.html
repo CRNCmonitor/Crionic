@@ -3,36 +3,31 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Crionic • CoinPaprika Dashboard</title>
+<title>Crionic • NestEx Dashboard</title>
 <style>
-:root{--bg:#050608;--neon-a:#00ffd5;--neon-b:#7b61ff;--text:#cfeee8;--muted:#94a3b8;--accent:#7be495}
+:root{--bg:#050608;--neon:#00ffd5;--accent:#7be495;--muted:#94a3b8;--text:#cfeee8}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:linear-gradient(180deg,#030406,#07080b);font-family:Inter,system-ui,Arial;color:var(--text)}
-.container{padding:20px;max-width:1200px;margin:0 auto}
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.title{font-weight:800;color:var(--neon-a);font-size:20px}
+.container{max-width:1100px;margin:18px auto;padding:18px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.title{font-weight:800;color:var(--neon);font-size:20px}
 .sub{color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.card{background:rgba(255,255,255,0.03);backdrop-filter:blur(8px);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.04);position:relative;overflow:hidden}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.card{background:rgba(255,255,255,0.03);backdrop-filter:blur(6px);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04)}
 .h3{font-size:13px;color:var(--accent);margin-bottom:8px}
-.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
-.row:last-child{border-bottom:0}
-.val{font-weight:700}
-.muted{color:var(--muted);font-size:13px}
-.btn{padding:7px 10px;border-radius:10px;background:linear-gradient(90deg,var(--neon-b),var(--neon-a));color:#041018;font-weight:700;text-decoration:none;border:none;cursor:pointer}
-.bar{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
-.bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));transition:width .9s}
-.log{font-family:monospace;color:var(--muted);font-size:12px;max-height:220px;overflow:auto;padding:8px;background:rgba(0,0,0,0.2);border-radius:8px}
-.footer{margin-top:14px;color:var(--muted);font-size:12px;text-align:center}
+.small{color:var(--muted);font-size:13px}
+.btn{padding:6px 10px;border-radius:8px;background:linear-gradient(90deg,#7b61ff,#00ffd5);border:none;color:#041018;font-weight:700;cursor:pointer}
+.log{font-family:monospace;color:var(--muted);font-size:12px;max-height:320px;overflow:auto;padding:8px;background:rgba(0,0,0,0.18);border-radius:6px}
 @media(max-width:980px){.grid{grid-template-columns:1fr}}
+.footer{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
 </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <div>
-        <div class="title">Crionic Dashboard</div>
-        <div class="sub">Pripojené len na CoinPaprika • live market data</div>
+        <div class="title">Crionic Dashboard • NestEx</div>
+        <div class="sub">Privátne info z NestEx (balances, orders) — server-side proxy, kľúče na serveri</div>
       </div>
       <div>
         <button id="btnRefresh" class="btn">Manual refresh</button>
@@ -41,114 +36,114 @@ html,body{height:100%;background:linear-gradient(180deg,#030406,#07080b);font-fa
 
     <div class="grid">
       <div class="card">
-        <div class="h3">Market (CoinPaprika) — CRNC</div>
-        <div class="row"><div class="muted">Cena (USD)</div><div id="price" class="val">—</div></div>
-        <div class="row"><div class="muted">24h Zmena</div><div id="percent" class="val">—</div></div>
-        <div class="row"><div class="muted">Market Cap</div><div id="mcap" class="val">—</div></div>
-        <div class="row"><div class="muted">Obchodný objem 24h</div><div id="vol" class="val">—</div></div>
-        <div style="margin-top:10px" class="row"><div class="muted">Supply</div><div id="supply" class="val">—</div></div>
+        <div class="h3">Balances</div>
+        <div id="balancesArea" class="small">Načítanie...</div>
+
+        <hr style="margin:10px 0;border:none;border-top:1px dashed rgba(255,255,255,0.03)">
+
+        <div class="h3">Orders (open)</div>
+        <div id="ordersArea" class="small">Načítanie...</div>
       </div>
 
       <div class="card">
-        <div class="h3">Price Spark</div>
-        <div style="padding:8px 0">
-          <div class="bar"><i id="priceBar"></i></div>
-        </div>
-        <div style="margin-top:12px" class="muted">Last updated: <span id="lastUpdated">—</span></div>
-        <div style="margin-top:12px">
-          <a class="btn" id="cpLink" href="https://coinpaprika.com/coin/crnc-crionic/" target="_blank">Open on CoinPaprika</a>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="h3">Quick Logs</div>
+        <div class="h3">Status & Logs</div>
+        <div id="statusBox" class="small">Stav: pripravený</div>
+        <div style="height:10px"></div>
+        <div class="h3">Log</div>
         <div id="logArea" class="log">—</div>
-      </div>
-
-      <div class="card" style="grid-column:span 3">
-        <div class="h3">Notes & links</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <a class="btn" href="https://github.com/diabaths/Crionic-Coin/releases" target="_blank">Crionic Wallet</a>
-          <a class="btn" href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">SRB Miner</a>
-          <a class="btn" href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex CRNC/USDT</a>
-        </div>
       </div>
     </div>
 
-    <div class="footer">Dashboard beží cez proxy • verejné nasadenie: hostni server.js (Render/Vercel/VPS)</div>
+    <div class="footer">Dbaj na bezpečnosť: API KEY/SECRET NEVKLADAJ do frontend kódu ani do repozitára.</div>
   </div>
 
 <script>
-/* FULL file code: only CoinPaprika used. Proxy required for public hosting. */
-const cfg = {
-  coinpaprika: '/proxy?url=https://api.coinpaprika.com/v1/tickers/crnc-crionic',
-  fastInterval: 1000,
-  slowInterval: 10000,
-  fetchTimeout: 6000
-};
+/*
+  index.html - calls server endpoints:
+   POST /api/nestex/checktoken
+   POST /api/nestex/balances
+   POST /api/nestex/orders
 
-function log(msg){ const el=document.getElementById('logArea'); el.textContent = new Date().toISOString() + '  ' + msg + '\n' + el.textContent; }
-function setBar(p){ const e=document.getElementById('priceBar'); e.style.width = Math.max(0, Math.min(100, p)) + '%'; }
-function fmt(n){ if(!n && n!==0) return '—'; if(n>=1000000) return (n/1000000).toFixed(2)+'M'; if(n>=1000) return (n/1000).toFixed(2)+'K'; return Number(n).toFixed(6); }
+  Server enforces 5s minimum gap. Frontend polls every 6s to be safe.
+*/
 
-async function fetchWithTimeout(url, timeout = cfg.fetchTimeout){
-  const controller = new AbortController();
-  const id = setTimeout(()=>controller.abort(), timeout);
+const cfg = { pollInterval: 6000, apiBase: '/api/nestex' };
+
+function log(msg){ const el=document.getElementById('logArea'); el.textContent = new Date().toISOString() + ' ' + msg + '\n' + el.textContent; }
+function setStatus(s){ document.getElementById('statusBox').textContent = 'Stav: ' + s; }
+
+async function postJson(path, body = {}) {
+  const url = cfg.apiBase + path;
+  const res = await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const ct = res.headers.get('content-type')||'';
+  let data;
+  try { data = ct.includes('application/json') ? await res.json() : await res.text(); }
+  catch(e){ data = await res.text(); }
+  return { status: res.status, data };
+}
+
+async function updateAll() {
+  setStatus('updating...');
   try{
-    const res = await fetch(url, {signal: controller.signal});
-    clearTimeout(id);
-    const ct = res.headers.get('content-type')||'';
-    if(ct.includes('application/json')) return await res.json();
-    const text = await res.text();
-    try{ return JSON.parse(text); } catch { return text; }
-  }catch(e){
-    clearTimeout(id);
-    throw e;
+    // check token first
+    const chk = await postJson('/checktoken');
+    if (chk.status === 200) {
+      setStatus('token ok');
+      log('checktoken ok');
+    } else {
+      setStatus('token invalid or error');
+      log('checktoken status ' + chk.status + ' ' + JSON.stringify(chk.data));
+    }
+
+    // balances
+    const bal = await postJson('/balances');
+    if (bal.status === 200) {
+      renderBalances(bal.data);
+      log('balances fetched');
+    } else {
+      document.getElementById('balancesArea').textContent = 'Error: ' + bal.status;
+      log('balances error: ' + JSON.stringify(bal.data));
+    }
+
+    // orders
+    const ord = await postJson('/orders');
+    if (ord.status === 200) {
+      renderOrders(ord.data);
+      log('orders fetched');
+    } else {
+      document.getElementById('ordersArea').textContent = 'Error: ' + ord.status;
+      log('orders error: ' + JSON.stringify(ord.data));
+    }
+
+  } catch (e) {
+    log('updateAll error: ' + (e.message || e));
+    setStatus('error');
+  } finally {
+    setTimeout(()=>setStatus('idle'), 4000);
   }
 }
 
-async function updateMarket(){
-  try{
-    const data = await fetchWithTimeout(cfg.coinpaprika);
-    if(!data){ log('coinpaprika: no data'); return; }
-    // coinpaprika ticker structure:
-    // price_usd or quotes.USD.price
-    const price = data?.quotes?.USD?.price ?? data?.price_usd ?? null;
-    const percent = data?.quotes?.USD?.percent_change_24h ?? data?.percent_change_24h ?? null;
-    const mcap = data?.market_cap ?? (data?.quotes?.USD?.market_cap ?? null);
-    const vol = data?.volume_24h ?? (data?.quotes?.USD?.volume_24h ?? null);
-    const supply = data?.circulating_supply ?? data?.circulating_supply;
+function renderBalances(data){
+  // expected data: { balances: {...}, locked: {...}, success: "ok" }
+  if(!data || !data.balances){ document.getElementById('balancesArea').textContent = JSON.stringify(data); return; }
+  const b = data.balances;
+  const l = data.locked || {};
+  const lines = Object.keys(b).map(k => `${k}: ${b[k]} (locked: ${l[k]||0})`);
+  document.getElementById('balancesArea').textContent = lines.join('\n');
+}
 
-    document.getElementById('price').textContent = price ? '$' + Number(price).toFixed(6) : '—';
-    document.getElementById('percent').textContent = percent !== null ? (Number(percent).toFixed(2) + '%') : '—';
-    document.getElementById('mcap').textContent = mcap ? '$' + (mcap >= 1e9 ? (mcap/1e9).toFixed(2)+'B' : (mcap>=1e6 ? (mcap/1e6).toFixed(2)+'M' : Number(mcap).toFixed(2))) : '—';
-    document.getElementById('vol').textContent = vol ? '$' + fmt(vol) : '—';
-    document.getElementById('supply').textContent = supply ? Number(supply).toLocaleString() : '—';
-
-    // simple price-based bar: scale price into 0-100 using sliding window heuristic
-    // we compute a moving window between minPriceSeen..maxPriceSeen in this session
-    updateMarket.min = updateMarket.min ?? Number(price) ?? 0;
-    updateMarket.max = updateMarket.max ?? Number(price) ?? 0;
-    const pnum = Number(price) || 0;
-    if(pnum < updateMarket.min) updateMarket.min = pnum;
-    if(pnum > updateMarket.max) updateMarket.max = pnum;
-    const range = (updateMarket.max - updateMarket.min) || 1;
-    const pct = ((pnum - updateMarket.min) / range) * 100;
-    setBar(pct);
-
-    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
-    log('coinpaprika fetched: price ' + (price ? '$'+Number(price).toFixed(6) : '—'));
-  }catch(e){
-    log('coinpaprika error: ' + (e.message || e));
-    document.getElementById('price').textContent = '—';
-  }
+function renderOrders(data){
+  // expected data: { orders: [ ... ], success: "ok" }
+  if(!data || !Array.isArray(data.orders)){ document.getElementById('ordersArea').textContent = JSON.stringify(data); return; }
+  const rows = data.orders.map(o => `#${o.order_id} ${o.cur} ${o.order_type} ${o.quantity} @ ${o.price} (${o.status})`);
+  document.getElementById('ordersArea').textContent = rows.length ? rows.join('\n') : 'No open orders';
 }
 
 // manual refresh button
-document.getElementById('btnRefresh').addEventListener('click', ()=>{ updateMarket(); });
+document.getElementById('btnRefresh').addEventListener('click', ()=>{ updateAll(); });
 
-updateMarket();
-setInterval(updateMarket, cfg.fastInterval);
+updateAll();
+setInterval(updateAll, cfg.pollInterval);
 </script>
 </body>
 </html>
