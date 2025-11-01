@@ -3,197 +3,139 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wallet Watcher — ETH & BSC</title>
-  <link rel="icon" href="data:;base64,iVBORw0KGgo="> 
+  <title>Wallet Watcher — Matrix Style</title>
   <style>
-    :root{--bg:#0b0b0b;--panel:#0f1410;--accent:#34d399;--muted:#6b7280}
-    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--accent)}
-    .wrap{max-width:880px;margin:28px auto;padding:20px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));box-shadow:0 6px 18px rgba(0,0,0,0.6)}
-    h1{margin:0 0 8px;font-size:20px}
-    p.lead{margin:0 0 18px;color:var(--muted);font-size:13px}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    input,select,button{background:#07100a;color:var(--accent);border:1px solid rgba(52,211,153,0.07);padding:10px;border-radius:8px;font-size:14px}
-    input{flex:1;min-width:220px}
-    button{cursor:pointer}
-    .card{background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;margin-top:12px}
-    pre{white-space:pre-wrap;color:#c7f9e0;margin:0}
-    table{width:100%;border-collapse:collapse;margin-top:8px}
-    th,td{padding:8px;text-align:left;font-size:13px}
-    th{color:var(--muted);font-weight:500}
-    tr:nth-child(even) td{background:rgba(255,255,255,0.01)}
-    a.ref{color:var(--accent);text-decoration:none;font-weight:600}
-    .small{font-size:12px;color:var(--muted)}
-    .footer{margin-top:14px;color:var(--muted);font-size:12px}
-    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.06);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    body {margin:0; background:#000; color:#00ff66; font-family: "Courier New", monospace;}
+    h1 {text-align:center; font-size:28px; margin-top:20px; text-shadow:0 0 6px #00ff66;}
+    .container {max-width:800px; margin:0 auto; padding:20px;}
+    .input-area {display:flex; gap:10px; justify-content:center; margin-top:20px;}
+    input {flex:1; padding:10px; background:#020; border:1px solid #0f0; color:#0f0; border-radius:4px;}
+    button {padding:10px 20px; background:#001900; color:#0f0; border:1px solid #0f0; cursor:pointer; border-radius:4px;}
+    button:hover {background:#003000;}
+    .status {text-align:center; margin-top:15px; color:#0f0; font-size:14px;}
+    .card {background:#010; border:1px solid #003300; border-radius:8px; padding:15px; margin-top:20px; box-shadow:0 0 10px rgba(0,255,0,0.2);}
+    table {width:100%; border-collapse:collapse; color:#0f0; margin-top:10px;}
+    th,td {border-bottom:1px solid #003300; padding:8px; text-align:left; font-size:13px;}
+    th {color:#00cc66;}
+    .ref-btns {text-align:center; margin-top:20px;}
+    .ref-btns a {margin:0 10px; padding:8px 18px; border:1px solid #0f0; text-decoration:none; color:#0f0; background:#001900; border-radius:4px;}
+    .ref-btns a:hover {background:#003000;}
+    .spinner {display:inline-block;width:14px;height:14px;border:2px solid rgba(0,255,0,0.2);border-top-color:#00ff66;border-radius:50%;animation:spin 1s linear infinite;margin-right:5px;}
+    @keyframes spin {to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Wallet Watcher — ETH & BSC</h1>
-    <p class="lead">Vlož adresu, klikni <em>Check</em>. Ukáže sa native balance pre Ethereum + BSC a tokeny (ETH tokeny cez Ethplorer). Vložené sú aj tvoje affiliate odkazy.</p>
-
-    <div class="row">
-      <input id="addr" placeholder="Zadaj adresu (ETH / BSC) — napr. 0x123..." spellcheck="false">
-      <select id="chain">
-        <option value="auto">Auto detect (recommended)</option>
-        <option value="eth">Ethereum</option>
-        <option value="bsc">BSC</option>
-      </select>
+  <h1>Wallet Watcher</h1>
+  <div class="container">
+    <div class="input-area">
+      <input id="addr" placeholder="Zadaj adresu (ETH / BSC)">
       <button id="check">Check</button>
     </div>
+    <div id="status" class="status">Čaká sa na akciu...</div>
 
-    <div class="card" id="status">
-      <div id="sttxt" class="small">Čaká sa na akciu...</div>
-    </div>
-
-    <div class="card" id="results" style="display:none">
-      <div><strong>Address:</strong> <span id="res-addr"></span></div>
-      <div style="margin-top:8px"><strong>Native balances</strong></div>
-      <table>
-        <thead><tr><th>Chain</th><th>Balance</th><th>USD (approx)</th></tr></thead>
-        <tbody id="native-body"></tbody>
-      </table>
-
-      <div style="margin-top:8px"><strong>Token holdings (ETH chain via Ethplorer)</strong></div>
-      <div id="tokens-area" style="margin-top:6px"></div>
-
-      <div style="margin-top:12px">
-        <a class="ref" href="https://partner.bydfi.com/register?vipCode=Jg9qYE" target="_blank">Trade on BYDFI (affiliate)</a>
-        &nbsp;·&nbsp;
-        <a class="ref" href="https://www.bitunix.com/register?vipCode=SATTO" target="_blank">Register on Bitunix (affiliate)</a>
+    <div id="results" style="display:none;">
+      <div class="card">
+        <h3>Native Balances</h3>
+        <table>
+          <thead><tr><th>Chain</th><th>Balance</th><th>USD (≈)</th></tr></thead>
+          <tbody id="native-body"></tbody>
+        </table>
       </div>
-    </div>
 
-    <div class="footer">
-      Poznámka: tokeny na BSC sa dajú zobraziť ak zadáš BscScan API key v nastaveniach. ETH tokeny používajú Ethplorer (freekey). Nie je to custody app — len viewer.
+      <div class="card">
+        <h3>Token Holdings (ETH chain)</h3>
+        <div id="tokens-area">—</div>
+      </div>
+
+      <div class="ref-btns">
+        <a href="https://partner.bydfi.com/register?vipCode=Jg9qYE" target="_blank">Trade on BYDFI</a>
+        <a href="https://www.bitunix.com/register?vipCode=SATTO" target="_blank">Register on Bitunix</a>
+      </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.3/dist/ethers.min.js"></script>
   <script>
-    // Simple Wallet Watcher
-    const btn = document.getElementById('check');
-    const addrInput = document.getElementById('addr');
-    const chainSelect = document.getElementById('chain');
-    const st = document.getElementById('sttxt');
-    const resWrap = document.getElementById('results');
-    const resAddr = document.getElementById('res-addr');
-    const nativeBody = document.getElementById('native-body');
-    const tokensArea = document.getElementById('tokens-area');
-
     const ETH_RPC = 'https://cloudflare-eth.com';
     const BSC_RPC = 'https://bsc-dataseed.binance.org/';
 
-    function short(a){ if(!a) return ''; return a.slice(0,6)+'...'+a.slice(-4); }
+    const btn = document.getElementById('check');
+    const addrInput = document.getElementById('addr');
+    const status = document.getElementById('status');
+    const results = document.getElementById('results');
+    const nativeBody = document.getElementById('native-body');
+    const tokensArea = document.getElementById('tokens-area');
 
-    function setStatus(text, busy=false){ st.innerHTML = busy ? `<span class="spinner"></span> ${text}` : text }
+    function setStatus(text, busy=false){
+      status.innerHTML = busy ? `<span class='spinner'></span>${text}` : text;
+    }
 
     async function fetchJSON(url){
-      try{ const r = await fetch(url); return await r.json(); }catch(e){return null}
+      try {const r = await fetch(url); return await r.json();} catch(e){return null;}
     }
 
     async function getNativeBalance(address, chain){
-      try{
+      try {
         const provider = new ethers.JsonRpcProvider(chain==='bsc'?BSC_RPC:ETH_RPC);
         const bal = await provider.getBalance(address);
-        const eth = Number(ethers.formatUnits(bal, 18));
-        return eth;
-      }catch(e){return null}
+        return Number(ethers.formatUnits(bal, 18));
+      } catch(e){return null;}
     }
 
-    async function getEthUSDPrice(){
-      try{ const j = await fetchJSON('https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2Cbinancecoin&vs_currencies=usd'); if(j && j.ethereum) return {eth:j.ethereum.usd, bnb:j.binancecoin.usd}; }catch(e){}; return {eth:null,bnb:null}
+    async function getPrices(){
+      const j = await fetchJSON('https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2Cbinancecoin&vs_currencies=usd');
+      return j ? {eth:j.ethereum.usd, bnb:j.binancecoin.usd} : {eth:null,bnb:null};
     }
 
-    async function fetchEthplorerTokens(address){
-      // Ethplorer free key
-      const url = `https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`;
-      return await fetchJSON(url);
+    async function getTokens(address){
+      const data = await fetchJSON(`https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`);
+      return data && data.tokens ? data.tokens : [];
     }
 
-    // BSC token txs via BscScan (optional API key) - hidden behind user prompt.
-    async function fetchBscTokens_bscscan(address, apiKey){
-      if(!apiKey) return null;
-      const url = `https://api.bscscan.com/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`;
-      return await fetchJSON(url);
-    }
+    async function display(address){
+      setStatus('Načítavam dáta...', true);
+      results.style.display='none';
+      nativeBody.innerHTML='';
+      tokensArea.innerHTML='—';
 
-    async function display(address, forcedChain){
-      resWrap.style.display='none'; nativeBody.innerHTML=''; tokensArea.innerHTML='';
-      resAddr.textContent = '';
+      const prices = await getPrices();
+      const ethBal = await getNativeBalance(address,'eth');
+      const bscBal = await getNativeBalance(address,'bsc');
 
-      setStatus('Detecting chain...', true);
-      let chain = forcedChain && forcedChain!=='auto' ? forcedChain : 'auto';
-      if(chain==='auto'){
-        // simple heuristic: if address starts with 0x -> both ETH/BSC; else use as-is
-        if(address.startsWith('0x')) chain = 'both'; else chain = 'eth';
-      }
-
-      setStatus('Fetching prices...', true);
-      const prices = await getEthUSDPrice();
-
-      setStatus('Fetching native balances...', true);
       const rows = [];
-      if(chain==='eth' || chain==='both'){
-        const b = await getNativeBalance(address,'eth');
-        rows.push({chain:'Ethereum', bal:b, usd: (prices.eth && b!=null) ? (b * prices.eth).toFixed(2) : '—'});
-      }
-      if(chain==='bsc' || chain==='both'){
-        const b2 = await getNativeBalance(address,'bsc');
-        rows.push({chain:'BSC (BNB)', bal:b2, usd: (prices.bnb && b2!=null) ? (b2 * prices.bnb).toFixed(2) : '—'});
-      }
+      if(ethBal!=null) rows.push(`<tr><td>Ethereum</td><td>${ethBal}</td><td>${(ethBal*prices.eth).toFixed(2)}</td></tr>`);
+      if(bscBal!=null) rows.push(`<tr><td>BSC</td><td>${bscBal}</td><td>${(bscBal*prices.bnb).toFixed(2)}</td></tr>`);
+      nativeBody.innerHTML = rows.join('');
 
-      setStatus('Rendering results...', false);
-      resAddr.textContent = address;
-      for(const r of rows){
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${r.chain}</td><td>${r.bal==null? '—' : r.bal}</td><td>${r.usd}</td>`;
-        nativeBody.appendChild(tr);
-      }
-
-      // tokens for ETH via Ethplorer
-      if(chain==='eth' || chain==='both'){
-        setStatus('Fetching token list from Ethplorer...', true);
-        const e = await fetchEthplorerTokens(address);
-        if(e && e.tokens && e.tokens.length){
-          const tbl = document.createElement('table');
-          tbl.innerHTML = '<thead><tr><th>Token</th><th>Symbol</th><th>Balance</th><th>USD value</th></tr></thead>';
-          const tbody = document.createElement('tbody');
-          for(const t of e.tokens){
-            const token = t.tokenInfo || {};
-            const sym = token.symbol || 'UNK';
-            const name = token.name || '';
-            const decimals = token.decimals ? Number(token.decimals) : 0;
-            const raw = Number(t.balance);
-            const bal = decimals ? raw / Math.pow(10, decimals) : raw;
-            const price = (t.tokenInfo && t.tokenInfo.price && t.tokenInfo.price.rate) ? (t.tokenInfo.price.rate * bal).toFixed(4) : '—';
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td title="${name}">${name}</td><td>${sym}</td><td>${bal}</td><td>${price}</td>`;
-            tbody.appendChild(tr);
-          }
-          tbl.appendChild(tbody);
-          tokensArea.appendChild(tbl);
-        } else {
-          tokensArea.innerHTML = '<div class="small">Žiadne tokeny (alebo Ethplorer nedal odpoveď).</div>';
+      const tokens = await getTokens(address);
+      if(tokens.length){
+        let tHTML = '<table><thead><tr><th>Name</th><th>Symbol</th><th>Balance</th><th>USD</th></tr></thead><tbody>';
+        for(const t of tokens){
+          const info = t.tokenInfo||{};
+          const name = info.name||'Unknown';
+          const sym = info.symbol||'';
+          const dec = info.decimals?Number(info.decimals):0;
+          const bal = dec? (Number(t.balance)/Math.pow(10,dec)): Number(t.balance);
+          const usd = (info.price && info.price.rate)? (bal*info.price.rate).toFixed(2) : '—';
+          tHTML += `<tr><td>${name}</td><td>${sym}</td><td>${bal}</td><td>${usd}</td></tr>`;
         }
+        tHTML += '</tbody></table>';
+        tokensArea.innerHTML = tHTML;
       } else {
-        tokensArea.innerHTML = '<div class="small">Tokeny na BSC je možné zobraziť iba ak zadáš BscScan API key v nastaveniach (voliteľné).</div>';
+        tokensArea.innerHTML = '<div>Žiadne tokeny nenájdené.</div>';
       }
 
-      resWrap.style.display='block';
+      results.style.display='block';
       setStatus('Hotovo.');
     }
 
-    btn.addEventListener('click', ()=>{
+    btn.onclick = ()=>{
       const a = addrInput.value.trim();
-      if(!a){ setStatus('Zadaj adresu.'); return; }
-      const forced = chainSelect.value;
-      display(a, forced);
-    });
+      if(!a){setStatus('Zadaj adresu.');return;}
+      display(a);
+    }
 
-    // Allow Enter key
-    addrInput.addEventListener('keyup', (e)=>{ if(e.key === 'Enter') btn.click(); });
+    addrInput.addEventListener('keyup', e=>{if(e.key==='Enter')btn.click();});
   </script>
 </body>
 </html>
