@@ -4,52 +4,86 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crionic Network Dashboard</title>
-<link rel="icon" href="https://explorer.crionic.org/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body {
   margin: 0;
   font-family: 'Orbitron', sans-serif;
-  background: radial-gradient(ellipse at bottom, #0b0c10 0%, #000000 100%);
-  color: #00ff9d;
+  background: radial-gradient(circle at bottom right, #031a1a 0%, #000000 80%);
+  color: #00ffd5;
+  overflow-x: hidden;
 }
 .container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-gap: 20px;
   padding: 20px;
 }
 .panel {
-  background: rgba(0, 255, 157, 0.07);
-  border: 1px solid rgba(0, 255, 157, 0.2);
+  background: rgba(0, 255, 200, 0.08);
+  border: 1px solid rgba(0, 255, 200, 0.3);
   border-radius: 15px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 20px rgba(0,255,157,0.2), inset 0 0 10px rgba(0,255,157,0.2);
-  padding: 15px;
-  animation: pulseGlow 4s infinite alternate;
+  backdrop-filter: blur(12px);
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(0,255,200,0.15), inset 0 0 10px rgba(0,255,200,0.1);
+  transition: transform 0.2s ease;
 }
-@keyframes pulseGlow {
-  from { box-shadow: 0 0 10px rgba(0,255,157,0.1); }
-  to { box-shadow: 0 0 25px rgba(0,255,157,0.5); }
+.panel:hover { transform: translateY(-5px); box-shadow: 0 0 30px rgba(0,255,200,0.4); }
+.title {
+  font-size: 1.3em;
+  color: #00fff2;
+  text-shadow: 0 0 10px #00ffc6;
+  margin-bottom: 10px;
 }
-.title { font-size: 1.3em; text-shadow: 0 0 10px #00ff9d; margin-bottom: 10px; }
-.value { font-size: 1.1em; margin: 5px 0; }
-.progress { height: 10px; background: rgba(0,255,157,0.1); border-radius: 10px; overflow: hidden; }
-.progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg,#00ff9d,#00e6ff); animation: pulseBar 2s infinite alternate; }
-@keyframes pulseBar { from{opacity:.7;} to{opacity:1;} }
-.footer { text-align: center; padding: 15px; font-size: .9em; color: #00e6ff; }
-a { color: #00ffcc; text-decoration: none; } a:hover { color: #fff; }
-#refresh-indicator { position: absolute; top: 10px; right: 60px; color: #00e6ff; font-size: .8em; opacity: .7; }
-#api-status { position: absolute; top: 15px; right: 20px; width: 15px; height: 15px; border-radius: 50%; background: gray; box-shadow: 0 0 10px gray; }
+.value {
+  font-size: 1.1em;
+  margin: 5px 0;
+}
 button {
-  background: rgba(0,255,157,0.15);
-  border: 1px solid #00ff9d;
-  color: #00ff9d;
+  background: rgba(0,255,200,0.15);
+  border: 1px solid #00ffd5;
+  color: #00ffd5;
   padding: 8px 15px;
   border-radius: 8px;
   cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
 }
-button:hover { background: rgba(0,255,157,0.3); }
+button:hover { background: rgba(0,255,200,0.3); }
+#api-status {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: gray;
+  box-shadow: 0 0 10px gray;
+}
+#refresh-indicator {
+  position: fixed;
+  top: 15px;
+  right: 50px;
+  color: #00e6ff;
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+.footer {
+  text-align: center;
+  padding: 15px;
+  font-size: 0.9em;
+  color: #00e6ff;
+}
+a { color: #00ffcc; text-decoration: none; }
+a:hover { color: #ffffff; }
+canvas { width: 100%; height: 180px; }
+input {
+  background: rgba(0,255,200,0.1);
+  border: 1px solid #00ffd5;
+  border-radius: 5px;
+  color: #00ffd5;
+  padding: 5px;
+  width: 80px;
+}
 </style>
 </head>
 <body>
@@ -60,17 +94,30 @@ button:hover { background: rgba(0,255,157,0.3); }
   <div class="panel" id="network">
     <div class="title">Network</div>
     <div class="value" id="hashrate">Hashrate: ...</div>
-    <div class="progress"><div class="progress-bar" id="hashrate-bar"></div></div>
     <div class="value" id="difficulty">Difficulty: ...</div>
-    <div class="progress"><div class="progress-bar" id="diff-bar"></div></div>
     <div class="value" id="connections">Connections: ...</div>
-    <div class="progress"><div class="progress-bar" id="conn-bar"></div></div>
+    <canvas id="networkChart"></canvas>
   </div>
 
   <div class="panel" id="market">
     <div class="title">Market</div>
     <div id="price">Price: ...</div>
     <div id="supply">Supply: ...</div>
+    <canvas id="priceChart"></canvas>
+  </div>
+
+  <div class="panel" id="blockchain">
+    <div class="title">Blockchain Info</div>
+    <div id="blockcount">Block Height: ...</div>
+    <div id="hodlers">Holders: ...</div>
+  </div>
+
+  <div class="panel" id="calc">
+    <div class="title">Mining Calculator</div>
+    <label>Hashrate (MH/s):</label> <input id="mh" type="number" value="100"><br><br>
+    <label>Difficulty:</label> <input id="diff" type="number" value="2000"><br><br>
+    <button onclick="calcProfit()">Calculate</button>
+    <div id="profitResult" style="margin-top:10px;">Estimated daily reward: ...</div>
   </div>
 
   <div class="panel" id="pools">
@@ -83,18 +130,7 @@ button:hover { background: rgba(0,255,157,0.3); }
     </ul>
   </div>
 
-  <div class="panel" id="explorer">
-    <div class="title">Explorer API</div>
-    <div id="blockcount">Block count: ...</div>
-  </div>
-
-  <div class="panel" id="downloads">
-    <div class="title">Downloads</div>
-    <button onclick="window.open('https://github.com/diabaths/Crionic-Coin/releases')">Crionic Core Wallet</button>
-    <button onclick="window.open('https://github.com/doktor83/SRBMiner-Multi/releases')">SRB Miner</button>
-  </div>
-
-  <div class="panel" id="socials">
+  <div class="panel" id="links">
     <div class="title">Social & Links</div>
     <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a><br>
     <a href="https://x.com/CrionicCoin" target="_blank">Twitter</a><br>
@@ -106,56 +142,99 @@ button:hover { background: rgba(0,255,157,0.3); }
 <div class="footer">Crionic Network Dashboard © 2025</div>
 
 <script>
+let priceChart, networkChart;
+let prices = [], times = [];
+let hashHistory = [], diffHistory = [];
+let apiStatus = document.getElementById('api-status');
+
 async function fetchMarket() {
-  const apiStatus = document.getElementById('api-status');
-  apiStatus.style.background = 'yellow';
-  apiStatus.style.boxShadow = '0 0 10px yellow';
+  apiStatus.style.background = 'yellow'; apiStatus.style.boxShadow = '0 0 10px yellow';
   try {
     const res = await fetch('https://api.coinpaprika.com/v1/tickers/crnc-crionic');
     const data = await res.json();
-    document.getElementById('price').innerText = `Price: ${data.quotes.USD.price.toFixed(6)} USD`;
+    const price = data.quotes.USD.price;
+    document.getElementById('price').innerText = `Price: ${price.toFixed(6)} USD`;
     document.getElementById('supply').innerText = `Supply: ${data.total_supply.toLocaleString()}`;
-    apiStatus.style.background = 'lime';
-    apiStatus.style.boxShadow = '0 0 10px lime';
-  } catch (err) {
-    apiStatus.style.background = 'red';
-    apiStatus.style.boxShadow = '0 0 10px red';
-    console.error('Coinpaprika API error:', err);
+    apiStatus.style.background = 'lime'; apiStatus.style.boxShadow = '0 0 10px lime';
+    const now = new Date().toLocaleTimeString();
+    if (prices.length > 30) { prices.shift(); times.shift(); }
+    prices.push(price); times.push(now);
+    updatePriceChart();
+  } catch (e) {
+    apiStatus.style.background = 'red'; apiStatus.style.boxShadow = '0 0 10px red';
+    console.error(e);
   }
 }
 
-// Simulated data (because Crionic explorer API is currently down)
 function fetchNetworkSim() {
-  const hash = (Math.random()*1e8).toFixed(2);
-  const diff = (Math.random()*5000).toFixed(2);
-  const conn = Math.floor(Math.random()*15)+1;
-  document.getElementById('hashrate').innerText = `Hashrate: ${hash}`;
-  document.getElementById('difficulty').innerText = `Difficulty: ${diff}`;
-  document.getElementById('connections').innerText = `Connections: ${conn}`;
-  document.getElementById('hashrate-bar').style.width = `${Math.min(hash/1000000,100)}%`;
-  document.getElementById('diff-bar').style.width = `${Math.min(diff/100,100)}%`;
-  document.getElementById('conn-bar').style.width = `${Math.min(conn*5,100)}%`;
+  const h = Math.random()*5e6 + 1e6;
+  const d = Math.random()*3000 + 500;
+  const c = Math.floor(Math.random()*12)+3;
+  document.getElementById('hashrate').innerText = `Hashrate: ${h.toFixed(0)} H/s`;
+  document.getElementById('difficulty').innerText = `Difficulty: ${d.toFixed(2)}`;
+  document.getElementById('connections').innerText = `Connections: ${c}`;
+  if (hashHistory.length > 30) { hashHistory.shift(); diffHistory.shift(); }
+  hashHistory.push(h); diffHistory.push(d);
+  updateNetworkChart();
 }
 
-function fetchExplorerSim() {
-  document.getElementById('blockcount').innerText = `Block count: ${100000 + Math.floor(Math.random()*1000)}`;
+function fetchBlockchainSim() {
+  document.getElementById('blockcount').innerText = `Block Height: ${100000 + Math.floor(Math.random()*1000)}`;
+  document.getElementById('hodlers').innerText = `Holders: ${Math.floor(Math.random()*5000)+1000}`;
+}
+
+function calcProfit() {
+  const mh = parseFloat(document.getElementById('mh').value);
+  const diff = parseFloat(document.getElementById('diff').value);
+  const reward = (mh / diff) * 50; // simplified formula
+  document.getElementById('profitResult').innerText = `Estimated daily reward: ${reward.toFixed(4)} CRNC`;
 }
 
 function updateIndicator() {
-  const el = document.getElementById('refresh-indicator');
-  const now = new Date();
-  el.innerText = 'Last refresh: ' + now.toLocaleTimeString();
+  document.getElementById('refresh-indicator').innerText = 'Last refresh: ' + new Date().toLocaleTimeString();
 }
 
-// 1s refresh for network/market, 10s for explorer
-setInterval(fetchNetworkSim, 1000);
+function initCharts() {
+  const ctx1 = document.getElementById('priceChart').getContext('2d');
+  const ctx2 = document.getElementById('networkChart').getContext('2d');
+  priceChart = new Chart(ctx1, {
+    type: 'line',
+    data: { labels: times, datasets: [{ label: 'Price (USD)', data: prices, borderColor: '#00ffd5', fill: false }]},
+    options: { scales: { x: { ticks: { color: '#00fff2' }}, y: { ticks: { color: '#00fff2' }}}}
+  });
+  networkChart = new Chart(ctx2, {
+    type: 'line',
+    data: { labels: Array(hashHistory.length).fill(''), datasets: [
+      { label: 'Hashrate', data: hashHistory, borderColor: '#00ffd5', fill: false },
+      { label: 'Difficulty', data: diffHistory, borderColor: '#0099ff', fill: false }
+    ]},
+    options: { scales: { x: { display: false }, y: { ticks: { color: '#00fff2' }}}}
+  });
+}
+
+function updatePriceChart() {
+  priceChart.data.labels = times;
+  priceChart.data.datasets[0].data = prices;
+  priceChart.update();
+}
+function updateNetworkChart() {
+  networkChart.data.labels = Array(hashHistory.length).fill('');
+  networkChart.data.datasets[0].data = hashHistory;
+  networkChart.data.datasets[1].data = diffHistory;
+  networkChart.update();
+}
+
+// Refresh intervals
 setInterval(fetchMarket, 1000);
-setInterval(fetchExplorerSim, 10000);
+setInterval(fetchNetworkSim, 1000);
+setInterval(fetchBlockchainSim, 10000);
 setInterval(updateIndicator, 1000);
 
-fetchNetworkSim();
+// Init
+initCharts();
 fetchMarket();
-fetchExplorerSim();
+fetchNetworkSim();
+fetchBlockchainSim();
 updateIndicator();
 </script>
 </body>
