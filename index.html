@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Crionic Live Dashboard</title>
 <style>
-  /* ---------- Reset & layout ---------- */
   :root{
     --bg:#050608;
     --panel: rgba(255,255,255,0.04);
@@ -17,54 +16,35 @@
     --muted: #94a3b8;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;background:linear-gradient(180deg,#030406 0%, #07080b 100%);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial; color:var(--text);-webkit-font-smoothing:antialiased}
+  html,body{height:100%;background:linear-gradient(180deg,#030406 0%, #07080b 100%);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:var(--text);-webkit-font-smoothing:antialiased}
   .wrap{min-height:100vh;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:18px;padding:22px;align-items:stretch}
-  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter: blur(8px);border:1px solid rgba(255,255,255,0.04);padding:14px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.6);position:relative;overflow:hidden}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.04);padding:14px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.6);position:relative;overflow:hidden}
   h3{font-size:14px;margin-bottom:8px;color:var(--accent);letter-spacing:0.6px}
   small{color:var(--muted);font-size:12px}
-
-  /* ---------- Neon animated gradient strip ---------- */
-  .neon-edge{position:absolute;inset:0;pointer-events:none;border-radius:14px;mix-blend-mode:screen;opacity:0.6;background:
-    linear-gradient(120deg, rgba(123,97,255,0.08), rgba(0,255,213,0.06));filter:blur(18px);transform:translateZ(0)}
+  .neon-edge{position:absolute;inset:0;pointer-events:none;border-radius:14px;mix-blend-mode:screen;opacity:0.6;background:linear-gradient(120deg, rgba(123,97,255,0.08), rgba(0,255,213,0.06));filter:blur(18px);transform:translateZ(0)}
   .neon-line{position:absolute;height:3px;left:-40%;right:-40%;top:0;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));animation:slide 6s linear infinite}
   @keyframes slide{0%{transform:translateX(-10%)}50%{transform:translateX(60%)}100%{transform:translateX(110%)}}
-
-  /* ---------- Grid sizing ---------- */
   .card.big{grid-column:1/3;grid-row:1/3}
   .card.tall{grid-row:1/3}
   .card.wide{grid-column:2/4}
   .grid-small{display:flex;flex-direction:column;gap:10px}
-
-  /* ---------- Data rows ---------- */
   .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
   .row:last-child{border-bottom:0}
   .value{font-weight:700}
   .muted{color:var(--muted);font-size:13px}
-
-  /* ---------- progress bars ---------- */
   .bar{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden;position:relative}
-  .bar > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));box-shadow:0 0 18px rgba(123,97,255,0.18),0 0 28px rgba(0,255,213,0.06);transition:width .9s cubic-bezier(.2,.9,.2,1)}
-  .pulse{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--neon-a);box-shadow:0 0 8px var(--neon-a);animation:pulse 1.6s infinite}
-  @keyframes pulse{0%{transform:scale(.8);opacity:.8}50%{transform:scale(1.4);opacity: .3}100%{transform:scale(.8);opacity:.8}}
-
-  /* ---------- buttons & links ---------- */
+  .bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));box-shadow:0 0 18px rgba(123,97,255,0.18),0 0 28px rgba(0,255,213,0.06);transition:width .9s cubic-bezier(.2,.9,.2,1)}
   .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);cursor:pointer;font-weight:600}
   .btn.small{padding:6px 9px;font-size:13px}
   .links{display:flex;gap:8px;flex-wrap:wrap}
-  a.link{color:var(--text);text-decoration:none}
   .download{background:linear-gradient(90deg,var(--neon-b),var(--neon-a));color:#04080a;padding:10px 14px;border-radius:10px;font-weight:700}
-
-  /* ---------- top bar ---------- */
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
-  .lang{display:flex;gap:8px;align-items:center}
   .flag{width:26px;height:18px;border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);cursor:pointer;display:inline-block}
   .indicator{display:flex;gap:8px;align-items:center}
   .spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.08);border-top-color:var(--neon-a);animation:spin 1s linear infinite;display:inline-block}
   @keyframes spin{to{transform:rotate(360deg)}}
-
-  /* ---------- responsive ---------- */
-  @media (max-width:980px){.wrap{grid-template-columns:1fr;grid-template-rows:repeat(9,auto)} .card.big{grid-column:auto;grid-row:auto}}
-  footer{margin-top:10px;text-align:center;color:var(--muted);font-size:12px}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr;grid-template-rows:repeat(9,auto)}.card.big{grid-column:auto;grid-row:auto}}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -75,513 +55,86 @@
         <small class="muted">live • futuristický HUD</small>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
-        <div class="lang">
-          <div class="flag" title="Slovenčina" data-lang="sk" onclick="setLang('sk')">
-            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='18'><rect width='26' height='18' fill='%23fff'/><rect width='26' height='12' y='6' fill='%23ef3340'/><rect width='26' height='6' y='12' fill='%23007a3d'/></svg>" />
-          </div>
-          <div class="flag" title="English" data-lang="en" onclick="setLang('en')">
-            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='18'><rect width='26' height='18' fill='%23b22234'/></svg>" />
-          </div>
-        </div>
         <div class="indicator">
-          <div id="autoref" class="btn small" title="Auto-refresh status"><span id="autoSpin" style="display:inline-block"></span><span id="lastFetch">—</span></div>
-          <div id="visitorCount" class="muted">visitors: 0</div>
+          <div id="autoref" class="btn small" title="Auto-refresh status"><span id="autoSpin"></span><span id="lastFetch">—</span></div>
         </div>
       </div>
     </div>
   </div>
 
   <main class="wrap" id="grid">
-    <!-- Network & Market (1s updates) -->
     <section class="card big" id="networkCard">
       <div class="neon-edge"></div><div class="neon-line"></div>
-      <div class="topbar"><h3 id="t_network">Network</h3><small id="s_network" class="muted">1 s refresh</small></div>
-
+      <div class="topbar"><h3>Network</h3><small class="muted">1 s refresh</small></div>
       <div class="grid-small">
-        <div class="row">
-          <div>
-            <div class="muted" id="lbl_hash">Hashrate</div>
-            <div class="value" id="val_hash">— H/s</div>
-          </div>
-          <div style="width:40%">
-            <div class="bar" aria-hidden><i id="bar_hash"></i></div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="muted" id="lbl_diff">Difficulty</div>
-            <div class="value" id="val_diff">—</div>
-          </div>
-          <div style="width:40%">
-            <div class="bar"><i id="bar_diff"></i></div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="muted" id="lbl_conn">Connections</div>
-            <div class="value" id="val_conn">—</div>
-          </div>
-          <div style="width:40%">
-            <div class="bar"><i id="bar_conn"></i></div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
-          <div class="muted">Explorer</div>
-          <div class="links">
-            <a class="btn small" href="https://explorer.crionic.org" target="_blank">Explorer</a>
-            <a class="btn small" href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a>
-            <a class="btn small" href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex</a>
-          </div>
-        </div>
+        <div class="row"><div><div class="muted">Hashrate</div><div class="value" id="val_hash">—</div></div><div style="width:40%"><div class="bar"><i id="bar_hash"></i></div></div></div>
+        <div class="row"><div><div class="muted">Difficulty</div><div class="value" id="val_diff">—</div></div><div style="width:40%"><div class="bar"><i id="bar_diff"></i></div></div></div>
+        <div class="row"><div><div class="muted">Connections</div><div class="value" id="val_conn">—</div></div><div style="width:40%"><div class="bar"><i id="bar_conn"></i></div></div></div>
       </div>
     </section>
 
-    <!-- Pools (10s updates) -->
-    <section class="card" id="poolsCard">
-      <div class="neon-line" style="top:auto;bottom:0;animation-duration:9s"></div>
-      <div class="topbar"><h3 id="t_pools">Pools</h3><small class="muted">10 s refresh</small></div>
-      <div style="margin-top:8px">
-        <div class="row">
-          <div>
-            <div class="muted">coin-miners.info</div>
-            <div class="value" id="cm_status">—</div>
-          </div>
-          <div style="text-align:right">
-            <a class="btn small" id="cm_link" href="https://pool.coin-miners.info" target="_blank">Open</a>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="muted">aikapool</div>
-            <div class="value" id="ai_status">—</div>
-          </div>
-          <div style="text-align:right">
-            <a class="btn small" href="https://aikapool.com" target="_blank">Open</a>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="muted">mining4people</div>
-            <div class="value" id="m4p_status">—</div>
-          </div>
-          <div style="text-align:right">
-            <a class="btn small" href="https://mining4people.com" target="_blank">Open</a>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="muted">zpool</div>
-            <div class="value" id="zpool_status">—</div>
-          </div>
-          <div style="text-align:right">
-            <a class="btn small" href="https://zpool.ca" target="_blank">Open</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Market -->
     <section class="card" id="marketCard">
-      <div class="neon-line" style="top:0;animation-duration:14s"></div>
-      <div class="topbar"><h3 id="t_market">Market</h3><small class="muted">1 s refresh</small></div>
-      <div style="margin-top:8px">
-        <div class="row">
-          <div>
-            <div class="muted">CoinPaprika (CRNC)</div>
-            <div class="value" id="cp_price">—</div>
-          </div>
-          <div style="text-align:right">
-            <a class="btn small" href="https://coinpaprika.com/coin/crnc-crionic/" target="_blank">Open</a>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="muted">Last block</div>
-            <div class="value" id="last_block">—</div>
-          </div>
-          <div style="width:40%">
-            <div class="bar"><i id="bar_block"></i></div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="muted">Network BTC price (from ext)</div>
-            <div class="value" id="net_btc">—</div>
-          </div>
-          <div style="text-align:right">
-            <a class="btn small" href="https://twitter.com" target="_blank">Twitter</a>
-            <a class="btn small" href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a>
-          </div>
-        </div>
-      </div>
+      <div class="neon-line" style="animation-duration:12s"></div>
+      <div class="topbar"><h3>Market</h3><small class="muted">1 s refresh</small></div>
+      <div class="row"><div><div class="muted">CoinPaprika (CRNC)</div><div class="value" id="cp_price">—</div></div></div>
     </section>
 
-    <!-- Explorer API quick -->
-    <section class="card tall" id="explorerCard">
-      <div class="neon-line" style="animation-duration:11s"></div>
-      <div class="topbar"><h3 id="t_explorer">Explorer API</h3><small class="muted">10 s refresh</small></div>
-      <div style="margin-top:8px">
-        <div class="row">
-          <div>
-            <div class="muted">Difficulty</div>
-            <div class="value" id="expl_diff">—</div>
-          </div>
-          <div style="text-align:right"><a class="btn small" href="https://explorer.crionic.org/api/getdifficulty" target="_blank">raw</a></div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="muted">Connections</div>
-            <div class="value" id="expl_conn">—</div>
-          </div>
-          <div style="text-align:right"><a class="btn small" href="https://explorer.crionic.org/api/getconnectioncount" target="_blank">raw</a></div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="muted">Blockcount</div>
-            <div class="value" id="expl_blockcount">—</div>
-          </div>
-          <div style="text-align:right"><a class="btn small" href="https://explorer.crionic.org/api/getblockcount" target="_blank">raw</a></div>
-        </div>
-
-        <div style="margin-top:8px"><small class="muted">Explorer links: tx / block / address</small></div>
-      </div>
+    <section class="card" id="poolsCard">
+      <div class="neon-line" style="animation-duration:9s"></div>
+      <div class="topbar"><h3>Pools</h3><small class="muted">10 s refresh</small></div>
+      <div class="row"><div class="muted">coin-miners.info</div><div class="value" id="cm_status">—</div></div>
     </section>
 
-    <!-- Tools & Downloads -->
-    <section class="card" id="toolsCard">
-      <div class="neon-line" style="top:auto;bottom:0;animation-duration:16s"></div>
-      <div class="topbar"><h3 id="t_tools">Tools & Links</h3><small class="muted">quick actions</small></div>
-      <div style="margin-top:8px;display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <a class="btn download" href="https://github.com/diabaths/Crionic-Coin/releases" target="_blank">Crionic Core Wallet</a>
-          <a class="btn" href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">SRB Miner</a>
-          <a class="btn" href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a>
-          <a class="btn" href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex</a>
-        </div>
-
-        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
-          <div class="muted">Pools quick jump</div>
-          <div class="links">
-            <a class="btn small" href="https://pool.coin-miners.info" target="_blank">coin-miners</a>
-            <a class="btn small" href="https://aikapool.com" target="_blank">aikapool</a>
-            <a class="btn small" href="https://mining4people.com" target="_blank">mining4people</a>
-            <a class="btn small" href="https://zpool.ca" target="_blank">zpool</a>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="muted">Auto language:</div>
-          <div id="detectedLang" class="value">—</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Empty / logs -->
     <section class="card wide" id="logCard">
-      <div class="topbar"><h3 id="t_logs">Live Logs</h3><small class="muted">errors • warnings</small></div>
-      <div style="margin-top:8px;max-height:280px;overflow:auto;font-family:monospace;font-size:12px;color:var(--muted)" id="logArea">—</div>
+      <div class="topbar"><h3>Logs</h3><small class="muted">fetch info</small></div>
+      <div id="logArea" style="font-family:monospace;font-size:12px;max-height:300px;overflow:auto;color:var(--muted)">—</div>
     </section>
   </main>
-
-  <footer style="padding:14px 22px 28px 22px">Simple single-file dashboard • designed for live API usage • sk</footer>
+  <footer>Crionic Dashboard • realtime API</footer>
 
 <script>
 const cfg = {
   explorerBase: '/proxy?url=https://explorer.crionic.org',
   poolBase: '/proxy?url=https://pool.coin-miners.info',
   coinpaprika: '/proxy?url=https://api.coinpaprika.com/v1/tickers/crnc-crionic',
-  ...
-};
-
-/* =========================
-   Basic config & strings
-   ========================= */
-const cfg = {
-  explorerBase: 'https://explorer.crionic.org',
-  poolBase: 'https://pool.coin-miners.info',
-  coinpaprika: 'https://api.coinpaprika.com/v1/tickers/crnc-crionic',
-  pools: [
-    {id:'coin-miners', url:'https://pool.coin-miners.info'},
-    {id:'aikapool', url:'https://aikapool.com'},
-    {id:'mining4people', url:'https://mining4people.com'},
-    {id:'zpool', url:'https://zpool.ca'}
-  ],
   intervals: {fast:1000, slow:10000},
   fetchTimeout:6000
 };
 
-const i18 = {
-  sk: {
-    visitors: 'návštevníkov',
-    live: 'live',
-    error: 'chyba',
-    fetchFailed: 'fetch zlyhal'
-  },
-  en: {
-    visitors: 'visitors',
-    live: 'live',
-    error: 'error',
-    fetchFailed: 'fetch failed'
-  }
-};
+function log(msg){ const el=document.getElementById('logArea'); el.innerText=(new Date()).toISOString()+" "+msg+"\n"+el.innerText;}
+function setBar(id,p){const e=document.getElementById(id);if(e)e.style.width=Math.min(100,Math.max(0,p))+"%";}
+function human(n){if(!n)return"—";let u=["","K","M","G","T"];let i=0;while(n>=1000&&i<u.length-1){n/=1000;i++;}return n.toFixed(2)+u[i];}
+function setFetching(on){const s=document.getElementById("autoSpin"),t=document.getElementById("lastFetch");if(on)s.innerHTML='<span class="spinner"></span>';else{s.innerHTML='';t.textContent=new Date().toLocaleTimeString();}}
 
-let LANG = (navigator.language||'en').startsWith('sk') ? 'sk' : 'en';
-document.getElementById('detectedLang').textContent = LANG;
+async function safeFetch(url){const t=setTimeout(()=>controller.abort(),cfg.fetchTimeout);const controller=new AbortController();try{const r=await fetch(url,{signal:controller.signal});clearTimeout(t);return await r.json();}catch(e){throw e;}}
 
-/* =========================
-   Utilities
-   ========================= */
-function txt(k){ return (i18[LANG] && i18[LANG][k]) ? i18[LANG][k] : i18.en[k] || k }
-function log(msg){ const el=document.getElementById('logArea'); el.innerText = (new Date()).toISOString() + '  ' + msg + '\n' + el.innerText; }
-function safeFetch(url, opts={}) {
-  // timeout wrapper
-  return new Promise((resolve,reject)=>{
-    const timer = setTimeout(()=>reject(new Error('timeout')), cfg.fetchTimeout);
-    fetch(url, opts).then(r=>{
-      clearTimeout(timer);
-      if(!r.ok) return reject(new Error('HTTP '+r.status));
-      // try parse JSON, else text
-      r.json().then(j=>resolve(j)).catch(_=>r.text().then(t=>resolve(t)));
-    }).catch(e=>{ clearTimeout(timer); reject(e) });
-  });
-}
-
-/* =========================
-   Auto visitor counter
-   - simple unique per-browser using localStorage + day key
-   ========================= */
-(function visitorCounter(){
-  try{
-    const key = 'crionic_unique_v1';
-    const stored = localStorage.getItem(key);
-    if(!stored){
-      localStorage.setItem(key, JSON.stringify({first:Date.now()}));
-      let cnt = localStorage.getItem('__crionic_global_visitors');
-      if(!cnt) cnt = 0;
-      // local increment only (global requires server). We'll keep a local total also.
-      localStorage.setItem('__crionic_global_visitors', String(Number(cnt)+1));
-    }
-    const visitors = localStorage.getItem('__crionic_global_visitors') || '1';
-    document.getElementById('visitorCount').textContent = `visitors: ${visitors}`;
-  }catch(e){ console.warn('visitorCounter failed',e) }
-})();
-
-/* =========================
-   Language switcher
-   ========================= */
-function setLang(l){
-  LANG = l;
-  document.getElementById('detectedLang').textContent = LANG;
-}
-
-/* =========================
-   Auto-refresh indicator
-   ========================= */
-let fetching = 0;
-function setFetching(on){
-  fetching = Math.max(0, fetching + (on?1:-1));
-  const spin = document.getElementById('autoSpin');
-  const last = document.getElementById('lastFetch');
-  if(fetching>0){
-    spin.innerHTML = '<span class="spinner"></span>';
-  } else {
-    spin.innerHTML = '';
-    last.textContent = new Date().toLocaleTimeString();
-  }
-}
-
-/* =========================
-   Animated bar helper
-   ========================= */
-function setBar(elId, pct){
-  const e = document.getElementById(elId);
-  if(!e) return;
-  let v = Math.max(0, Math.min(100, pct));
-  e.style.width = v+'%';
-}
-
-/* =========================
-   Update functions
-   ========================= */
-async function updateNetworkAndMarket(){
-  // 1s updates: network hashrate, difficulty, connections, market (coinpaprika)
+async function updateFast(){
   setFetching(true);
   try{
-    // explorer getnetworkhashps
-    try{
-      const netHash = await safeFetch(cfg.explorerBase + '/api/getnetworkhashps');
-      const h = Number(netHash) || (netHash.hashrate || netHash);
-      const display = humanNumber(h) + ' H/s';
-      document.getElementById('val_hash').textContent = display;
-      // choose scale: set percent relative to a growing baseline (we'll scale log)
-      const pct = normalizeLog(h);
-      setBar('bar_hash', pct);
-    }catch(e){ log('explorer getnetworkhashps: '+e.message); document.getElementById('val_hash').textContent = '—'; }
-
-    // difficulty
-    try{
-      const diff = await safeFetch(cfg.explorerBase + '/api/getdifficulty');
-      const d = Number(diff || (diff && diff.difficulty) || 0);
-      document.getElementById('val_diff').textContent = d ? formatNumber(d) : '—';
-      setBar('bar_diff', normalizeLinear(d, 1e6)); // rough scale
-    }catch(e){ log('getdifficulty: '+e.message); }
-
-    // connections
-    try{
-      const conn = await safeFetch(cfg.explorerBase + '/api/getconnectioncount');
-      const c = Number(conn) || 0;
-      document.getElementById('val_conn').textContent = c;
-      setBar('bar_conn', Math.min(100, (c/200)*100));
-    }catch(e){ log('getconnectioncount: '+e.message); }
-
-    // coinpaprika market
-    try{
-      const cp = await safeFetch(cfg.coinpaprika);
-      // cp expected object with quotes
-      const price = cp && (cp.quotes ? (cp.quotes.USD.price || cp.quotes.USD.price) : cp.price_usd || cp.price);
-      document.getElementById('cp_price').textContent = price ? '$' + round(price,6) : '—';
-    }catch(e){
-      log('coinpaprika: '+e.message);
-      document.getElementById('cp_price').textContent = '—';
-    }
-
-    // last block quick (ext/getbasicstats or ext/getsummary)
-    try{
-      const sum = await safeFetch(cfg.explorerBase + '/ext/getsummary');
-      if(sum){
-        const lb = sum.blockcount || sum.blockCount || sum.lastblock || sum.block_count;
-        document.getElementById('last_block').textContent = lb || '—';
-        setBar('bar_block', lb ? ((lb % 1000)/1000*100) : 0);
-        document.getElementById('net_btc').textContent = sum.btcprice ? '$'+sum.btcprice : (sum.price_usd? '$'+sum.price_usd:'—');
-      }
-    }catch(e){ log('ext/getsummary: '+e.message) }
-
-  }catch(e){
-    log('updateNetworkAndMarket overall: '+e.message)
-  } finally {
-    setFetching(false);
-  }
+    const h=await safeFetch(cfg.explorerBase+'/api/getnetworkhashps');
+    document.getElementById('val_hash').textContent=human(h);setBar('bar_hash',70);
+    const d=await safeFetch(cfg.explorerBase+'/api/getdifficulty');
+    document.getElementById('val_diff').textContent=d;setBar('bar_diff',40);
+    const c=await safeFetch(cfg.explorerBase+'/api/getconnectioncount');
+    document.getElementById('val_conn').textContent=c;setBar('bar_conn',Math.min(100,(c/100)*100));
+    const m=await safeFetch(cfg.coinpaprika);
+    const p=m?.quotes?.USD?.price||m?.price_usd||0;
+    document.getElementById('cp_price').textContent='$'+p.toFixed(6);
+  }catch(e){log('Fast update: '+e.message);}
+  setFetching(false);
 }
 
-async function updatePoolsAndExplorer(){
-  setFetching(true);
+async function updateSlow(){
   try{
-    // pool.coin-miners.info status & currencies
-    try{
-      const st = await safeFetch(cfg.poolBase + '/api/status');
-      if(st){
-        document.getElementById('cm_status').textContent = 'OK';
-        // show one coin summary if available
-        let keys = Object.keys(st);
-        if(keys.length>0){
-          const pick = st[keys[0]];
-          // pick.hashrate expected
-          const hr = pick.hashrate || pick.hashrate_last24h || 0;
-          document.getElementById('cm_status').textContent = `${keys[0]} • h/s ${humanNumber(hr)}`;
-        }
-      } else {
-        document.getElementById('cm_status').textContent = '—';
-      }
-    }catch(e){ log('pool status: '+e.message); document.getElementById('cm_status').textContent = 'ERR' }
-
-    try{
-      const cur = await safeFetch(cfg.poolBase + '/api/currencies');
-      if(cur){
-        // optionally show one currency workers
-        const one = Object.keys(cur)[0];
-        if(one){
-          const c = cur[one];
-          document.getElementById('cm_link').textContent = `${one} ${c.workers||0}w`;
-        }
-      }
-    }catch(e){ log('pool currencies: '+e.message) }
-
-    // explorer API endpoints
-    try{
-      const diff = await safeFetch(cfg.explorerBase + '/api/getdifficulty');
-      document.getElementById('expl_diff').textContent = diff || '—';
-    }catch(e){ log('explorer diff: '+e.message); document.getElementById('expl_diff').textContent = 'ERR' }
-
-    try{
-      const conn = await safeFetch(cfg.explorerBase + '/api/getconnectioncount');
-      document.getElementById('expl_conn').textContent = conn || '—';
-    }catch(e){ log('explorer conn: '+e.message); document.getElementById('expl_conn').textContent = 'ERR' }
-
-    try{
-      const bc = await safeFetch(cfg.explorerBase + '/api/getblockcount');
-      document.getElementById('expl_blockcount').textContent = bc || '—';
-    }catch(e){ log('explorer blockcount: '+e.message); document.getElementById('expl_blockcount').textContent = 'ERR' }
-
-    // quick check other pools (simple fetch to root to test reachable)
-    for(const p of cfg.pools){
-      (async function poolCheck(p){
-        try{
-          // try fetch with HEAD-like GET but we just check response.ok; many sites block CORS -> fail gracefully
-          const r = await safeFetch(p.url, {mode:'cors'});
-          document.getElementById((p.id==='coin-miners'?'cm_status':p.id+'_status')).textContent = 'online';
-        }catch(e){
-          document.getElementById((p.id==='coin-miners'?'cm_status':p.id+'_status')).textContent = 'unreachable';
-          log(`${p.id}: ${e.message}`);
-        }
-      })(p);
-    }
-
-  }catch(e){
-    log('updatePoolsAndExplorer overall: '+e.message);
-  } finally {
-    setFetching(false);
-  }
+    const pool=await safeFetch(cfg.poolBase+'/api/status');
+    if(pool)document.getElementById('cm_status').textContent='online';
+  }catch(e){document.getElementById('cm_status').textContent='offline';log('Pool: '+e.message);}
 }
 
-/* =========================
-   Helpers for number formatting & scales
-   ========================= */
-function humanNumber(n){
-  if(!n && n!==0) return '—';
-  n = Number(n);
-  const units = ['','K','M','G','T','P'];
-  let u = 0;
-  while(n>=1000 && u<units.length-1){ n/=1000; u++ }
-  return round(n,2) + units[u];
-}
-function formatNumber(n){ return n? String(Math.round(n)) : '—' }
-function round(n,dec=2){ return Math.round(n*(10**dec))/(10**dec) }
-function normalizeLog(x){ if(!x) return 0; const val = Math.log10(x+1); // log10 scale
-  // map to 0-100: assume plausible log range 3..12
-  const min=3, max=12;
-  return Math.max(2, Math.min(100, ((val-min)/(max-min))*100 ));
-}
-function normalizeLinear(x,scale){ if(!x) return 0; return Math.min(100, (x/scale)*100); }
-
-/* =========================
-   Init & intervals
-   ========================= */
-updateNetworkAndMarket(); // immediate
-updatePoolsAndExplorer();
-let fastTimer = setInterval(updateNetworkAndMarket, cfg.intervals.fast);
-let slowTimer = setInterval(updatePoolsAndExplorer, cfg.intervals.slow);
-
-/* =========================
-   UI extras & cleanup
-   ========================= */
-// auto set spinner startup indicator
-setTimeout(()=>{ document.getElementById('lastFetch').textContent = 'initializing' }, 300);
-window.addEventListener('beforeunload', ()=>{ clearInterval(fastTimer); clearInterval(slowTimer); });
-
-/* =========================
-   Final notes
-   ========================= */
-log('dashboard started — using real API endpoints. Expect CORS restrictions depending on server config.');
+updateFast();updateSlow();
+setInterval(updateFast,cfg.intervals.fast);
+setInterval(updateSlow,cfg.intervals.slow);
+log('dashboard started with proxy mode');
 </script>
 </body>
 </html>
