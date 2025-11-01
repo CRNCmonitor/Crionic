@@ -1,117 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-lang-key="page_title">Crionic Network Dashboard - Futurism</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css"> </head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crionic Network Dashboard</title>
+<link rel="icon" href="https://explorer.crionic.org/favicon.ico">
+<style>
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: radial-gradient(ellipse at bottom, #0b0c10 0%, #000000 100%);
+  color: #00ff9d;
+  overflow-x: hidden;
+}
+.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 15px;
+  padding: 20px;
+}
+.panel {
+  background: rgba(0, 255, 157, 0.07);
+  border: 1px solid rgba(0, 255, 157, 0.2);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(0,255,157,0.2), inset 0 0 10px rgba(0,255,157,0.2);
+  padding: 15px;
+  animation: pulseGlow 4s infinite alternate;
+}
+@keyframes pulseGlow {
+  from { box-shadow: 0 0 10px rgba(0,255,157,0.1); }
+  to { box-shadow: 0 0 25px rgba(0,255,157,0.5); }
+}
+.title {
+  font-size: 1.3em;
+  text-shadow: 0 0 10px #00ff9d;
+  margin-bottom: 10px;
+}
+.value {
+  font-size: 1.1em;
+  margin: 5px 0;
+}
+.progress {
+  height: 10px;
+  background: rgba(0,255,157,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ff9d, #00e6ff);
+  animation: pulseBar 2s infinite alternate;
+}
+@keyframes pulseBar {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+.footer {
+  text-align: center;
+  padding: 15px;
+  font-size: 0.9em;
+  color: #00e6ff;
+}
+a { color: #00ffcc; text-decoration: none; }
+a:hover { color: #ffffff; }
+.flag { width: 24px; cursor: pointer; margin: 0 3px; }
+#refresh-indicator {
+  text-align: right;
+  color: #00e6ff;
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+button {
+  background: rgba(0,255,157,0.15);
+  border: 1px solid #00ff9d;
+  color: #00ff9d;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+}
+button:hover { background: rgba(0,255,157,0.3); }
+</style>
+</head>
 <body>
+<div id="refresh-indicator">Last refresh: --</div>
 
-    <header class="header-glass-effect">
-        <h1 class="neon-text">CRIONIC NETWORK STATUS</h1>
-        <div id="language-switcher">
-            <button class="flag-button" data-lang="en">🇬🇧</button>
-            <button class="flag-button" data-lang="sk">🇸🇰</button>
-            <button class="flag-button" data-lang="de">🇩🇪</button>
-            <button class="flag-button" data-lang="ru">🇷🇺</button>
-        </div>
-    </header>
+<div class="container">
+  <div class="panel" id="network">
+    <div class="title">Network</div>
+    <div class="value" id="hashrate">Hashrate: ...</div>
+    <div class="progress"><div class="progress-bar" id="hashrate-bar"></div></div>
+    <div class="value" id="difficulty">Difficulty: ...</div>
+    <div class="progress"><div class="progress-bar" id="diff-bar"></div></div>
+    <div class="value" id="connections">Connections: ...</div>
+    <div class="progress"><div class="progress-bar" id="conn-bar"></div></div>
+  </div>
 
-    <main class="container">
-        
-        <section id="network-market-section" class="animated-gradient-panel">
-            <h2 data-lang-key="network_market_title" class="section-title">NETWORK & MARKET DATA</h2>
-            <div class="data-grid">
-                
-                <div class="data-box glass-effect">
-                    <span data-lang-key="hashrate_label">Network Hashrate</span>
-                    <span id="network-hashrate" class="data-value neon-glow-green">Loading...</span>
-                    <div class="progress-indicator"><div id="hashrate-bar" class="progress-bar pulsating"></div></div>
-                </div>
-                
-                <div class="data-box glass-effect">
-                    <span data-lang-key="difficulty_label">Difficulty</span>
-                    <span id="difficulty" class="data-value neon-glow-blue">Loading...</span>
-                    <div class="progress-indicator"><div id="difficulty-bar" class="progress-bar pulsating"></div></div>
-                </div>
-                
-                <div class="data-box glass-effect">
-                    <span data-lang-key="market_price_label">CRNC Price (USD)</span>
-                    <span id="market-price" class="data-value neon-glow-cyan">Loading...</span>
-                </div>
-                
-            </div>
-        </section>
+  <div class="panel" id="market">
+    <div class="title">Market</div>
+    <div id="price">Price: ...</div>
+    <div id="supply">Supply: ...</div>
+  </div>
 
-        <hr class="divider neon-divider">
+  <div class="panel" id="pools">
+    <div class="title">Pools</div>
+    <ul>
+      <li><a href="https://pool.coin-miners.info" target="_blank">Coin-Miners</a></li>
+      <li><a href="https://aikapool.com" target="_blank">AikaPool</a></li>
+      <li><a href="https://mining4people.com" target="_blank">Mining4People</a></li>
+      <li><a href="https://zpool.ca" target="_blank">ZPool</a></li>
+    </ul>
+  </div>
 
-        <section id="pools-explorer-section" class="animated-gradient-panel">
-            <h2 data-lang-key="pools_explorer_title" class="section-title">POOLS & EXPLORER API</h2>
+  <div class="panel" id="explorer">
+    <div class="title">Explorer API</div>
+    <div id="blockcount">Block count: ...</div>
+  </div>
 
-            <div class="data-grid">
-                <div class="data-box glass-effect">
-                    <span data-lang-key="block_count_label">Block Count</span>
-                    <span id="block-count" class="data-value neon-glow-yellow">Loading...</span>
-                </div>
-                <div class="data-box glass-effect">
-                    <span data-lang-key="connections_label">Connections</span>
-                    <span id="connections" class="data-value neon-glow-magenta">Loading...</span>
-                    <div class="progress-indicator"><div id="connections-bar" class="progress-bar pulsating"></div></div>
-                </div>
-                <div class="data-box glass-effect">
-                    <span data-lang-key="supply_label">Money Supply</span>
-                    <span id="money-supply" class="data-value neon-glow-blue">Loading...</span>
-                </div>
-            </div>
+  <div class="panel" id="downloads">
+    <div class="title">Downloads</div>
+    <button onclick="window.open('https://github.com/diabaths/Crionic-Coin/releases')">Crionic Core Wallet</button>
+    <button onclick="window.open('https://github.com/doktor83/SRBMiner-Multi/releases')">SRB Miner</button>
+  </div>
 
-            <h3 data-lang-key="pools_title" class="subsection-title">Available Pools</h3>
-            <div class="pool-links">
-                <a href="https://coin-miners.info" target="_blank" class="pool-link glass-button neon-glow-green">coin-miners.info</a>
-                <a href="https://aikapool.com" target="_blank" class="pool-link glass-button neon-glow-blue">aikapool.com</a>
-                <a href="https://mining4people.com" target="_blank" class="pool-link glass-button neon-glow-cyan">mining4people.com</a>
-                <a href="https://zpool.ca" target="_blank" class="pool-link glass-button neon-glow-yellow">zpool.ca</a>
-            </div>
-            
-            <h3 data-lang-key="api_docs_title" class="subsection-title">Explorer API Documentation</h3>
-            <div class="api-docs-list glass-effect">
-                <p><span data-lang-key="api_getdifficulty">getdifficulty:</span> <a href="https://explorer.crionic.org/api/getdifficulty" target="_blank">explorer.crionic.org/api/getdifficulty</a></p>
-                <p><span data-lang-key="api_getblockcount">getblockcount:</span> <a href="https://explorer.crionic.org/api/getblockcount" target="_blank">explorer.crionic.org/api/getblockcount</a></p>
-                <p><span data-lang-key="api_getnetworkhashps">getnetworkhashps:</span> <a href="https://explorer.crionic.org/api/getnetworkhashps" target="_blank">explorer.crionic.org/api/getnetworkhashps</a></p>
-                <p><span data-lang-key="api_getmoneysupply">getmoneysupply:</span> <a href="https://explorer.crionic.org/ext/getmoneysupply" target="_blank">explorer.crionic.org/ext/getmoneysupply</a></p>
-                <p><span data-lang-key="api_pool_status">Coin-Miners Pool Status:</span> <a href="https://pool.coin-miners.info/api/status" target="_blank">pool.coin-miners.info/api/status</a></p>
-            </div>
-        </section>
+  <div class="panel" id="socials">
+    <div class="title">Social & Links</div>
+    <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a><br>
+    <a href="https://x.com/CrionicCoin" target="_blank">Twitter</a><br>
+    <a href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a><br>
+    <a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex Exchange</a>
+  </div>
+</div>
 
-        <hr class="divider neon-divider">
+<div class="footer">
+  <span id="lang-switch">
+    <img src="https://flagcdn.com/w20/us.png" class="flag" onclick="setLang('en')">
+    <img src="https://flagcdn.com/w20/sk.png" class="flag" onclick="setLang('sk')">
+  </span>
+  <br>Crionic Network Dashboard © 2025
+</div>
 
-        <section id="downloads-social" class="animated-gradient-panel">
-            
-            <h2 data-lang-key="downloads_title" class="section-title">DOWNLOADS & SOCIAL</h2>
-            <div class="button-grid">
-                <a href="https://github.com/diabaths/Crionic-Coin/releases" target="_blank" class="glass-button neon-glow-magenta button-wallet" data-lang-key="wallet_download">Crionic Core Wallet</a>
-                <a href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank" class="glass-button neon-glow-green button-miner" data-lang-key="miner_download">SRB Miner</a>
-                <a href="https://app.komodoplatform.com/wallet/crnc" target="_blank" class="glass-button neon-glow-blue button-komodo" data-lang-key="komodo_wallet">Komodo Wallet (CRNC)</a>
-                <a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank" class="glass-button neon-glow-cyan button-nestex" data-lang-key="nestex_exchange">Nestex Exchange (CRNC/USDT)</a>
-            </div>
+<script>
+let lang = navigator.language.startsWith('sk') ? 'sk' : 'en';
 
-            <h3 data-lang-key="social_title" class="subsection-title">Connect with us</h3>
-            <div class="social-links button-grid">
-                <a href="https://twitter.com/Crionic_Coin" target="_blank" class="glass-button neon-glow-blue social-link">Twitter 🐦</a>
-                <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank" class="glass-button neon-glow-magenta social-link">Discord 💬</a>
-            </div>
-        </section>
-        
-        <hr class="divider neon-divider">
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('lang', l);
+  location.reload();
+}
 
-        <footer class="footer-glass-effect">
-            <p id="visitor-counter" data-lang-key="visitors_label">Unique Visitors: 1</p>
-            <div id="refresh-indicator" class="refresh-indicator">
-                <span data-lang-key="refresh_label">Auto-Refresh:</span> 
-                <span id="refresh-status" class="neon-glow-green">ON</span>
-            </div>
-        </footer>
-    </main>
-    
-    <script src="app.js"></script> </body>
+async function fetchNetwork() {
+  try {
+    const [hash, diff, conn] = await Promise.all([
+      fetch('https://explorer.crionic.org/api/getnetworkhashps').then(r=>r.text()),
+      fetch('https://explorer.crionic.org/api/getdifficulty').then(r=>r.text()),
+      fetch('https://explorer.crionic.org/api/getconnectioncount').then(r=>r.text())
+    ]);
+    document.getElementById('hashrate').innerText = `Hashrate: ${parseFloat(hash).toFixed(2)}`;
+    document.getElementById('difficulty').innerText = `Difficulty: ${parseFloat(diff).toFixed(2)}`;
+    document.getElementById('connections').innerText = `Connections: ${conn}`;
+    document.getElementById('hashrate-bar').style.width = `${Math.min(parseFloat(hash)/100000000,100)}%`;
+    document.getElementById('diff-bar').style.width = `${Math.min(parseFloat(diff)/10000,100)}%`;
+    document.getElementById('conn-bar').style.width = `${Math.min(parseFloat(conn)*5,100)}%`;
+  } catch (e) { console.error(e); }
+}
+
+async function fetchMarket() {
+  try {
+    const res = await fetch('https://explorer.crionic.org/ext/getsummary');
+    const data = await res.json();
+    document.getElementById('price').innerText = `Price: ${data.summary.usd.toFixed(5)} USD`;
+    document.getElementById('supply').innerText = `Supply: ${data.summary.supply.toLocaleString()}`;
+  } catch (e) { console.error(e); }
+}
+
+async function fetchExplorer() {
+  try {
+    const res = await fetch('https://explorer.crionic.org/api/getblockcount');
+    const text = await res.text();
+    document.getElementById('blockcount').innerText = `Block count: ${text}`;
+  } catch (e) { console.error(e); }
+}
+
+function updateIndicator() {
+  const el = document.getElementById('refresh-indicator');
+  const now = new Date();
+  el.innerText = 'Last refresh: ' + now.toLocaleTimeString();
+}
+
+setInterval(fetchNetwork, 1000);
+setInterval(fetchMarket, 1000);
+setInterval(fetchExplorer, 10000);
+setInterval(updateIndicator, 1000);
+
+fetchNetwork();
+fetchMarket();
+fetchExplorer();
+updateIndicator();
+</script>
+</body>
 </html>
