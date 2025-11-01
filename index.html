@@ -40,7 +40,7 @@
       </div>
     </header>
 
-    <div id="status" class="status">Ready. Služby: Ethplorer (freekey) • CoinGecko • Public RPC.</div>
+    <div id="status" class="status">Ready. Služby: Covalent (ckey_docs) • CoinGecko • Public RPC.</div>
     <div class="grid">
       <div class="card">
         <div class="small">Výsledky sa zobrazia tu po kliknutí na Check</div>
@@ -57,7 +57,7 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.3/dist/ethers.min.js"></script>
   <script>
     const ETH_RPC = 'https://cloudflare-eth.com';
-    const ETHPLORER = 'https://api.ethplorer.io/getAddressInfo/';
+    const COVALENT = 'https://api.covalenthq.com/v1/eth-mainnet/address/';
     const COINGECKO = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
     const btn = document.getElementById('check');
     const addrInput = document.getElementById('addr');
@@ -72,26 +72,29 @@
 
     async function analyze(addr){
       setStatus('Načítavam dáta...', true);
-      const ethData = await fetchJSON(`${ETHPLORER}${addr}?apiKey=freekey`);
+      const covalentURL = `${COVALENT}${addr}/balances_v2/?key=ckey_docs`;
+      const data = await fetchJSON(covalentURL);
       const priceData = await fetchJSON(COINGECKO);
-      if(!ethData || !priceData){ setStatus('Nepodarilo sa načítať údaje.'); return; }
+      if(!data || !priceData){ setStatus('Nepodarilo sa načítať údaje.'); return; }
 
+      const items = data.data.items || [];
       const ethPrice = priceData.ethereum.usd;
       const provider = new ethers.JsonRpcProvider(ETH_RPC);
       const bal = await provider.getBalance(addr);
       const ethBalance = Number(ethers.formatUnits(bal, 18));
       const usdValue = (ethBalance * ethPrice).toFixed(2);
 
-      let html = `<div><b>ETH balance:</b> ${ethBalance} ETH ≈ ${usdValue} USD</div>`;
-      if(ethData.tokens){
-        html += '<table><thead><tr><th>Token</th><th>Symbol</th><th>Balance</th></tr></thead><tbody>';
-        ethData.tokens.slice(0,10).forEach(t=>{
-          const info = t.tokenInfo||{};
-          const dec = info.decimals? Number(info.decimals):0;
-          const bal = dec? Number(t.balance)/Math.pow(10,dec):Number(t.balance);
-          html += `<tr><td>${info.name||'?'}</td><td>${info.symbol||''}</td><td>${bal.toFixed(4)}</td></tr>`;
+      let html = `<div><b>ETH balance:</b> ${ethBalance.toFixed(4)} ETH ≈ ${usdValue} USD</div>`;
+      if(items.length){
+        html += '<table><thead><tr><th>Token</th><th>Symbol</th><th>Balance</th><th>USD</th></tr></thead><tbody>';
+        items.slice(0,10).forEach(t=>{
+          const bal = t.balance / Math.pow(10, t.contract_decimals);
+          const usd = t.quote ? t.quote.toFixed(2) : '–';
+          html += `<tr><td>${t.contract_name||'?'}</td><td>${t.contract_ticker_symbol||''}</td><td>${bal.toFixed(4)}</td><td>${usd}</td></tr>`;
         });
         html += '</tbody></table>';
+      } else {
+        html += '<div class="small">Žiadne tokeny nenájdené.</div>';
       }
       out.innerHTML = html;
       setStatus('Hotovo.');
