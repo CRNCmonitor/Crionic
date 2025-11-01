@@ -1,100 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>⚡ CRIONIC NETWORK MONITOR ⚡</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 body {
   margin:0; font-family:'Orbitron',sans-serif;
-  background: radial-gradient(circle at top, #050505 0%, #000 100%);
-  color:#9fffe0;
+  background:#0a0a0a; color:#aef7de;
 }
-h1 {
-  text-align:center; color:#00ffc3; text-shadow:0 0 12px #00ffc3; margin:15px 0;
-}
-.grid {
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:15px; padding:20px;
+h1 { text-align:center; color:#00ffc3; margin:20px 0; }
+.container {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:12px; padding:15px;
 }
 .panel {
-  background:rgba(15,15,15,0.6); border:1px solid #007a5e; border-radius:12px; padding:15px;
-  box-shadow:0 0 12px #007a5e44 inset,0 0 8px #007a5e55; backdrop-filter:blur(10px);
-  transition:0.3s; animation:glow 5s infinite alternate;
+  background:#111; border:1px solid #00ffc333;
+  border-radius:10px; padding:12px;
+  box-shadow:0 0 8px #00ffc333 inset;
 }
-@keyframes glow {from{box-shadow:0 0 8px #00ffc333 inset;} to{box-shadow:0 0 20px #00ffc399 inset;}}
-h2 {margin-top:0;color:#00ffc3;font-size:1.1rem;border-bottom:1px solid #007a5e44;padding-bottom:5px;}
-.progress {height:6px;background:#003326;border-radius:4px;overflow:hidden;margin:3px 0;}
-.progress div {height:100%;width:0;background:linear-gradient(90deg,#00ffc3,#00aaff);transition:width 0.6s;}
-a {color:#00ffc3;text-decoration:none;margin:3px;display:inline-block;border:1px solid #00ffc3;border-radius:6px;padding:5px 9px;}
-a:hover{background:#00ffc3;color:#000;}
-.langs {text-align:center;margin:5px 0;}
-.langs img {width:28px;height:20px;margin:2px;cursor:pointer;border:1px solid #00ffc3;border-radius:3px;}
-footer {text-align:center;font-size:0.8rem;color:#888;padding:15px;margin-top:25px;border-top:1px solid #007a5e44;}
-.txlist {max-height:180px;overflow-y:auto;font-size:0.8rem;}
-.txlist div{border-bottom:1px solid #007a5e33;padding:3px 0;}
-.txlist span{color:#00ffc3;}
+h2 { color:#00ffc3; margin-top:0; font-size:1rem; }
+a { color:#00ffc3; text-decoration:none; }
+a:hover { text-decoration:underline; }
+#langSelect { text-align:center; margin-bottom:10px; }
+select { background:#000; color:#00ffc3; border:1px solid #00ffc3; border-radius:5px; padding:5px; }
+footer { text-align:center; font-size:0.8rem; color:#777; padding:15px; border-top:1px solid #222; margin-top:20px; }
+.txlist { max-height:180px; overflow:auto; font-size:0.8rem; }
+.txlist div { border-bottom:1px solid #222; padding:3px 0; }
 </style>
 </head>
 <body>
 <h1>⚡ CRIONIC NETWORK MONITOR ⚡</h1>
-<div class="langs" id="langFlags"></div>
 
-<div class="grid">
+<div id="langSelect">
+  <select id="lang">
+    <option value="en">English</option>
+    <option value="sk" selected>Slovensky</option>
+  </select>
+</div>
+
+<div class="container">
   <div class="panel" id="network">
-    <h2 id="lbl_network">Network</h2>
+    <h2 id="lbl_network">Sieť</h2>
     <div>Hashrate: <span id="hashrate">...</span></div>
-    <div class="progress"><div id="barHash"></div></div>
     <div>Difficulty: <span id="difficulty">...</span></div>
-    <div class="progress"><div id="barDiff"></div></div>
     <div>Connections: <span id="connections">...</span></div>
-    <div class="progress"><div id="barConn"></div></div>
     <div>Blocks: <span id="blocks">...</span></div>
   </div>
 
   <div class="panel" id="market">
-    <h2 id="lbl_market">Market</h2>
+    <h2 id="lbl_market">Trh</h2>
     <div>Price USD: <span id="price_usd">...</span></div>
     <div>Price BTC: <span id="price_btc">...</span></div>
     <div>Money Supply: <span id="supply">...</span></div>
   </div>
 
   <div class="panel">
-    <h2 id="lbl_pools">Pools</h2>
-    <ul>
-      <li><a href="https://coin-miners.info" target="_blank">Coin-Miners</a></li>
-      <li><a href="https://aikapool.com" target="_blank">Aikapool</a></li>
-      <li><a href="https://mining4people.com" target="_blank">Mining4People</a></li>
-      <li><a href="https://zpool.ca" target="_blank">Zpool</a></li>
-    </ul>
+    <h2 id="lbl_pools">Pooly</h2>
+    <a href="https://coin-miners.info" target="_blank">Coin-Miners</a><br>
+    <a href="https://aikapool.com" target="_blank">Aikapool</a><br>
+    <a href="https://mining4people.com" target="_blank">Mining4People</a><br>
+    <a href="https://zpool.ca" target="_blank">Zpool</a>
   </div>
 
   <div class="panel">
-    <h2 id="lbl_explorer">Explorer</h2>
+    <h2 id="lbl_explorer">Prieskumník</h2>
     <div id="explorerData">...</div>
   </div>
 
   <div class="panel">
-    <h2 id="lbl_tx">Latest Transactions</h2>
+    <h2 id="lbl_tx">Posledné transakcie</h2>
     <div class="txlist" id="txList">...</div>
   </div>
 
   <div class="panel">
-    <h2 id="lbl_downloads">Downloads</h2>
+    <h2 id="lbl_downloads">Na stiahnutie</h2>
     <a href="https://github.com/diabaths/Crionic-Coin/releases" target="_blank">Crionic Core Wallet</a><br>
     <a href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">SRB Miner</a>
   </div>
 
   <div class="panel">
-    <h2 id="lbl_links">Community & Exchanges</h2>
-    <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a>
-    <a href="https://twitter.com/CrionicCoin" target="_blank">Twitter</a>
-    <a href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a>
+    <h2 id="lbl_links">Komunita & Burzy</h2>
+    <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a><br>
+    <a href="https://twitter.com/CrionicCoin" target="_blank">Twitter</a><br>
+    <a href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a><br>
     <a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex Exchange</a>
   </div>
 
   <div class="panel">
-    <h2 id="lbl_summary">Summary</h2>
+    <h2 id="lbl_summary">Súhrn</h2>
     <div id="summary">...</div>
   </div>
 </div>
@@ -102,79 +96,66 @@ footer {text-align:center;font-size:0.8rem;color:#888;padding:15px;margin-top:25
 <footer>© 2025 Crionic Network Monitor | ⚡ Created by Crionic Fans ⚡</footer>
 
 <script>
-// --- MULTILANGUAGE ---
-const flags = ['en','de','fr','ru','jp','pl','it','br','in','tw','ua','nl','th','bg','srb','ca','uk','dom','khm','lv','md','by','sk'];
-const flagDiv = document.getElementById("langFlags");
-flags.forEach(l=>{
-  let img=document.createElement('img');
-  img.src=`https://flagcdn.com/24x18/${l.slice(0,2)}.png`;
-  img.title=l.toUpperCase();
-  img.onclick=()=>{localStorage.setItem('lang',l);location.reload();}
-  flagDiv.appendChild(img);
-});
-let lang=localStorage.getItem('lang')||navigator.language.slice(0,2);
-if(!flags.includes(lang))lang='en';
-fetch('lang.json').then(r=>r.json()).then(tr=>{
-  if(tr[lang]) {
-    for(const k in tr[lang]) {
-      let el=document.getElementById(k);
-      if(el) el.textContent=tr[lang][k];
-    }
-  }
-});
+// preklady
+const tr = {
+  en: {lbl_network:"Network", lbl_market:"Market", lbl_pools:"Pools", lbl_explorer:"Explorer", lbl_tx:"Latest Transactions", lbl_downloads:"Downloads", lbl_links:"Community & Exchanges", lbl_summary:"Summary"},
+  sk: {lbl_network:"Sieť", lbl_market:"Trh", lbl_pools:"Pooly", lbl_explorer:"Prieskumník", lbl_tx:"Posledné transakcie", lbl_downloads:"Na stiahnutie", lbl_links:"Komunita & Burzy", lbl_summary:"Súhrn"}
+};
+function setLang(l){ for(const k in tr[l]){ let el=document.getElementById(k); if(el) el.textContent=tr[l][k]; } localStorage.setItem('lang',l); }
+const langSel=document.getElementById('lang');
+langSel.value=localStorage.getItem('lang')||'sk';
+setLang(langSel.value);
+langSel.onchange=()=>setLang(langSel.value);
 
-// --- API FUNKCIE ---
-async function apiText(url){return fetch(url).then(r=>r.text()).catch(()=>"...");}
-async function apiJson(url){return fetch(url).then(r=>r.json()).catch(()=>({}));}
+// API
+async function fetchJSON(url){ try{const r=await fetch(url);return await r.json();}catch{return null;} }
+async function fetchText(url){ try{const r=await fetch(url);return await r.text();}catch{return "...";} }
 
 async function updateNetwork(){
-  const diff=await apiText("https://explorer.crionic.org/api/getdifficulty");
-  const conn=await apiText("https://explorer.crionic.org/api/getconnectioncount");
-  const hash=await apiText("https://explorer.crionic.org/api/getnetworkhashps");
-  const block=await apiText("https://explorer.crionic.org/api/getblockcount");
-  document.getElementById("difficulty").textContent=parseFloat(diff).toFixed(2);
+  const diff=await fetchText("https://explorer.crionic.org/api/getdifficulty");
+  const conn=await fetchText("https://explorer.crionic.org/api/getconnectioncount");
+  const hash=await fetchText("https://explorer.crionic.org/api/getnetworkhashps");
+  const block=await fetchText("https://explorer.crionic.org/api/getblockcount");
+  document.getElementById("difficulty").textContent=isNaN(diff)?diff:Number(diff).toFixed(2);
   document.getElementById("connections").textContent=conn;
   document.getElementById("blocks").textContent=block;
-  document.getElementById("hashrate").textContent=(parseFloat(hash)/1e6).toFixed(2)+" MH/s";
-  document.getElementById("barHash").style.width=(Math.random()*100)+"%";
-  document.getElementById("barDiff").style.width=(Math.random()*100)+"%";
-  document.getElementById("barConn").style.width=(Math.random()*100)+"%";
+  document.getElementById("hashrate").textContent=isNaN(hash)?hash:(Number(hash)/1e6).toFixed(2)+" MH/s";
 }
 
 async function updateMarket(){
-  const price=await apiText("https://explorer.crionic.org/ext/getcurrentprice");
-  const supply=await apiText("https://explorer.crionic.org/ext/getmoneysupply");
-  document.getElementById("price_usd").textContent="$"+parseFloat(price).toFixed(6);
-  document.getElementById("price_btc").textContent=(parseFloat(price)/70000).toFixed(8)+" BTC";
-  document.getElementById("supply").textContent=parseFloat(supply).toLocaleString();
+  const price=await fetchText("https://explorer.crionic.org/ext/getcurrentprice");
+  const supply=await fetchText("https://explorer.crionic.org/ext/getmoneysupply");
+  document.getElementById("price_usd").textContent=isNaN(price)?"...":"$"+Number(price).toFixed(6);
+  document.getElementById("price_btc").textContent=isNaN(price)?"...":(Number(price)/70000).toFixed(8)+" BTC";
+  document.getElementById("supply").textContent=isNaN(supply)?"...":Number(supply).toLocaleString();
 }
 
 async function updateExplorer(){
-  const data=await apiJson("https://explorer.crionic.org/ext/getbasicstats");
-  if(data.blockcount)
+  const data=await fetchJSON("https://explorer.crionic.org/ext/getbasicstats");
+  if(data && data.blockcount)
     document.getElementById("explorerData").textContent=`Blocks: ${data.blockcount} | Supply: ${data.supply} | USD: $${data.usd}`;
 }
 
 async function updateSummary(){
-  const data=await apiJson("https://explorer.crionic.org/ext/getsummary");
-  if(data.difficulty)
+  const data=await fetchJSON("https://explorer.crionic.org/ext/getsummary");
+  if(data && data.difficulty)
     document.getElementById("summary").textContent=`Diff: ${data.difficulty.toFixed(2)} | Hash: ${(data.hashrate/1e6).toFixed(2)} MH/s | Conn: ${data.connections} | Blocks: ${data.blockcount}`;
 }
 
 async function updateTxs(){
-  const data=await apiJson("https://explorer.crionic.org/ext/getlasttxs/10/0/10");
-  let list=document.getElementById("txList");
+  const data=await fetchJSON("https://explorer.crionic.org/ext/getlasttxs/1/0/10");
+  const list=document.getElementById("txList");
   list.innerHTML="";
-  if(Array.isArray(data.data)){
+  if(data && Array.isArray(data.data)){
     data.data.forEach(tx=>{
-      let d=document.createElement("div");
-      d.innerHTML=`<span>${tx.timestamp}</span> | <a href="https://explorer.crionic.org/tx/${tx.txid}" target="_blank">${tx.txid.slice(0,12)}...</a> | ${tx.value} CRNC`;
-      list.appendChild(d);
+      const div=document.createElement("div");
+      div.innerHTML=`<a href="https://explorer.crionic.org/tx/${tx.txid}" target="_blank">${tx.txid.slice(0,12)}...</a> | ${tx.value} CRNC`;
+      list.appendChild(div);
     });
   } else list.textContent="No data";
 }
 
-// --- INTERVALY ---
+// intervaly
 setInterval(updateNetwork,1000);
 setInterval(updateMarket,1000);
 setInterval(updateExplorer,10000);
