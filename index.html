@@ -21,13 +21,10 @@
     table{width:100%;border-collapse:collapse;margin-top:8px}
     th,td{padding:8px;text-align:left;font-size:13px;border-bottom:1px solid rgba(0,255,102,0.03)}
     th{color:rgba(0,255,102,0.9)}
-    .badge{display:inline-block;padding:6px 10px;border-radius:6px;background:rgba(0,255,102,0.03);border:1px solid rgba(0,255,102,0.06);font-size:13px}
     .ref{display:inline-block;margin:6px;padding:8px 12px;border-radius:6px;background:transparent;border:1px solid rgba(0,255,102,0.08);color:var(--neon);text-decoration:none}
     .center{text-align:center}
     .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,255,102,0.12);border-top-color:var(--neon);border-radius:50%;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px}
     @keyframes spin{to{transform:rotate(360deg)}}
-    footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
-    @media(max-width:900px){.grid{grid-template-columns:1fr;}.controls{flex-direction:column;align-items:stretch}input{min-width:unset;width:100%}}
   </style>
 </head>
 <body>
@@ -40,11 +37,10 @@
       </div>
     </header>
 
-    <div id="status" class="status">Ready. Služby: Covalent (proxy) • CoinGecko • Public RPC.</div>
+    <div id="status" class="status">Ready. Skúsim viac zdrojov a proxy, aby to nezamrzlo.</div>
     <div class="grid">
       <div class="card">
-        <div class="small">Výsledky sa zobrazia tu po kliknutí na Check</div>
-        <div id="output"></div>
+        <div id="output" class="small">Výsledky sa zobrazia tu po kliknutí na Check</div>
       </div>
       <div class="card center">
         <strong>Partneri</strong><br>
@@ -58,68 +54,140 @@
   <script>
     const ETH_RPC = 'https://cloudflare-eth.com';
     const COINGECKO = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
+
+    const statusEl = document.getElementById('status');
+    const out = document.getElementById('output');
     const btn = document.getElementById('check');
     const addrInput = document.getElementById('addr');
-    const status = document.getElementById('status');
-    const out = document.getElementById('output');
 
-    function setStatus(msg, busy=false){
-      status.innerHTML = busy ? '<span class="spinner"></span>' + msg : msg;
+    function setStatus(msg,busy=false){ statusEl.innerHTML = busy? '<span class="spinner"></span>'+msg : msg; }
+
+    function timeout(ms, err='Timeout'){ return new Promise((_,rej)=>setTimeout(()=>rej(new Error(err)), ms)); }
+
+    async function fetchJSONDirect(url){
+      const r = await fetch(url);
+      const ct = r.headers.get('content-type')||'';
+      const txt = await r.text();
+      if (ct.includes('application/json')) return JSON.parse(txt);
+      try { return JSON.parse(txt); } catch { return null; }
     }
 
-    async function fetchJSON(url){ 
+    async function fetchJSONWithProxies(url){
+      const candidates = [
+        (u)=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+        (u)=>`https://cors.isomorphic-git.org/${u}`,
+        (u)=>`https://thingproxy.freeboard.io/fetch/${u}`
+      ];
+      let lastErr = null;
+      for(const wrap of candidates){
+        const proxied = wrap(url);
+        try{
+          const p = fetchJSONDirect(proxied);
+          const j = await Promise.race([p, timeout(12000)]);
+          if (j) return j;
+        }catch(e){ lastErr = e; }
+      }
+      throw lastErr || new Error('All proxies failed');
+    }
+
+    async function getEthPrice(){
       try{
-        const r = await fetch(url);
-        return await r.json();
-      }catch(e){
-        console.error(e);
-        return null;
-      }
+        const p = fetchJSONDirect(COINGECKO);
+        const j = await Promise.race([p, timeout(8000)]);
+        return j && j.ethereum ? j.ethereum.usd : null;
+      }catch{ return null; }
     }
 
-    async function analyze(addr){
-      setStatus('Načítavam dáta...', true);
+    async function getEthBalance(addr){
+      try{
+        const provider = new ethers.JsonRpcProvider(ETH_RPC);
+        const bal = await Promise.race([provider.getBalance(addr), timeout(8000)]);
+        return Number(ethers.formatUnits(bal,18));
+      }catch{ return null; }
+    }
 
-      // Použitie CORS proxy
-      const covalentURL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(
-        `https://api.covalenthq.com/v1/eth-mainnet/address/${addr}/balances_v2/?key=ckey_docs`
-      );
+    async function getTokensCovalent(addr){
+      const url = `https://api.covalenthq.com/v1/eth-mainnet/address/${addr}/balances_v2/?key=ckey_docs`;
+      return await fetchJSONWithProxies(url);
+    }
 
-      const data = await fetchJSON(covalentURL);
-      const priceData = await fetchJSON(COINGECKO);
+    async function getTokensEthplorer(addr){
+      const base = `https://api.ethplorer.io/getAddressInfo/${addr}?apiKey=freekey`;
+      const j = await fetchJSONWithProxies(base);
+      if(!j) return null;
+      // normalizácia do „covalent-like“ tvaru
+      const items = (j.tokens||[]).map(t=>{
+        const info = t.tokenInfo||{};
+        const dec = Number(info.decimals||0);
+        const bal = Number(t.balance||0) / (dec?Math.pow(10,dec):1);
+        const quote = info.price && info.price.rate ? bal*info.price.rate : null;
+        return {
+          contract_name: info.name||'?',
+          contract_ticker_symbol: info.symbol||'',
+          contract_decimals: dec,
+          balance: bal * (dec? Math.pow(10,dec):1), // pôvodný raw
+          quote
+        };
+      });
+      return { data:{ items } };
+    }
 
-      if(!data || !data.data || !priceData){ 
-        setStatus('Nepodarilo sa načítať údaje (proxy alebo API).'); 
-        return; 
-      }
+    function render(addr, ethBalance, ethPrice, items, sourceLabel){
+      let html = '';
+      const ethUsd = (ethBalance!=null && ethPrice!=null) ? (ethBalance*ethPrice).toFixed(2) : '–';
+      html += `<div><b>Adresa:</b> ${addr}</div>`;
+      html += `<div><b>ETH balance:</b> ${ethBalance!=null? ethBalance.toFixed(6):'–'} ETH ≈ ${ethUsd} USD</div>`;
+      html += `<div class="small" style="margin:6px 0">Zdroj tokenov: ${sourceLabel}</div>`;
 
-      const items = data.data.items || [];
-      const ethPrice = priceData.ethereum.usd;
-
-      const provider = new ethers.JsonRpcProvider(ETH_RPC);
-      const bal = await provider.getBalance(addr);
-      const ethBalance = Number(ethers.formatUnits(bal, 18));
-      const usdValue = (ethBalance * ethPrice).toFixed(2);
-
-      let html = `<div><b>ETH balance:</b> ${ethBalance.toFixed(4)} ETH ≈ ${usdValue} USD</div>`;
-      if(items.length){
+      if(items && items.length){
         html += '<table><thead><tr><th>Token</th><th>Symbol</th><th>Balance</th><th>USD</th></tr></thead><tbody>';
-        items.slice(0,10).forEach(t=>{
-          const bal = t.balance / Math.pow(10, t.contract_decimals);
-          const usd = t.quote ? t.quote.toFixed(2) : '–';
-          html += `<tr><td>${t.contract_name||'?'}</td><td>${t.contract_ticker_symbol||''}</td><td>${bal.toFixed(4)}</td><td>${usd}</td></tr>`;
+        items.slice(0,12).forEach(t=>{
+          const bal = t.contract_decimals ? (t.balance/Math.pow(10,t.contract_decimals)) : t.balance;
+          const usd = (t.quote!=null) ? t.quote.toFixed(2) : '–';
+          html += `<tr><td>${t.contract_name||'?'}</td><td>${t.contract_ticker_symbol||''}</td><td>${isFinite(bal)?bal.toFixed(6):'–'}</td><td>${usd}</td></tr>`;
         });
         html += '</tbody></table>';
       } else {
-        html += '<div class="small">Žiadne tokeny nenájdené.</div>';
+        html += '<div class="small">Žiadne tokeny nenájdené alebo API vrátilo prázdno.</div>';
       }
       out.innerHTML = html;
+    }
+
+    async function analyze(addr){
+      setStatus('Načítavam dáta (ETH balance + ceny)...', true);
+
+      const [ethPrice, ethBal] = await Promise.all([getEthPrice(), getEthBalance(addr)]);
+      if(ethBal==null){
+        setStatus('RPC balance zlyhal. Skús neskôr alebo inú adresu.'); 
+        out.innerHTML = '';
+        return;
+      }
+
+      setStatus('Hľadám tokeny cez Covalent...', true);
+      let items = null, source = '';
+      try{
+        const cov = await getTokensCovalent(addr);
+        const arr = cov && cov.data && Array.isArray(cov.data.items) ? cov.data.items : [];
+        if(arr.length){ items = arr; source = 'Covalent (proxy)'; }
+      }catch{ /* ignoruj, vyskúšame fallback */ }
+
+      if(!items){
+        setStatus('Covalent zlyhal. Skúšam Ethplorer...', true);
+        try{
+          const ethp = await getTokensEthplorer(addr);
+          const arr = ethp && ethp.data && Array.isArray(ethp.data.items) ? ethp.data.items : [];
+          if(arr.length){ items = arr; source = 'Ethplorer (proxy)'; }
+        }catch{ /* stále nič */ }
+      }
+
+      render(addr, ethBal, ethPrice, items||[], source||'—');
       setStatus('Hotovo.');
     }
 
-    btn.onclick = ()=> {
+    btn.onclick = ()=>{
       const addr = addrInput.value.trim();
       if(!addr){ setStatus('Zadaj ETH adresu.'); return; }
+      out.innerHTML = '';
       analyze(addr);
     };
     addrInput.addEventListener('keyup', e=>{ if(e.key==='Enter') btn.click(); });
