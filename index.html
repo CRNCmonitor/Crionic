@@ -65,12 +65,23 @@ body {
 }
 a { color: #00ffcc; text-decoration: none; }
 a:hover { color: #ffffff; }
-.flag { width: 24px; cursor: pointer; margin: 0 3px; }
 #refresh-indicator {
-  text-align: right;
+  position: absolute;
+  top: 10px;
+  right: 60px;
   color: #00e6ff;
   font-size: 0.8em;
   opacity: 0.7;
+}
+#api-status {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: gray;
+  box-shadow: 0 0 10px gray;
 }
 button {
   background: rgba(0,255,157,0.15);
@@ -86,6 +97,7 @@ button:hover { background: rgba(0,255,157,0.3); }
 </head>
 <body>
 <div id="refresh-indicator">Last refresh: --</div>
+<div id="api-status" title="API Status"></div>
 
 <div class="container">
   <div class="panel" id="network">
@@ -134,37 +146,36 @@ button:hover { background: rgba(0,255,157,0.3); }
   </div>
 </div>
 
-<div class="footer">
-  <span id="lang-switch">
-    <img src="https://flagcdn.com/w20/us.png" class="flag" onclick="setLang('en')">
-    <img src="https://flagcdn.com/w20/sk.png" class="flag" onclick="setLang('sk')">
-  </span>
-  <br>Crionic Network Dashboard © 2025
-</div>
+<div class="footer">Crionic Network Dashboard © 2025</div>
 
 <script>
-let lang = navigator.language.startsWith('sk') ? 'sk' : 'en';
-
-function setLang(l) {
-  lang = l;
-  localStorage.setItem('lang', l);
-  location.reload();
-}
+let apiOK = false;
 
 async function fetchNetwork() {
+  const statusEl = document.getElementById('api-status');
+  statusEl.style.background = 'yellow';
+  statusEl.style.boxShadow = '0 0 10px yellow';
   try {
     const [hash, diff, conn] = await Promise.all([
       fetch('https://explorer.crionic.org/api/getnetworkhashps').then(r=>r.text()),
       fetch('https://explorer.crionic.org/api/getdifficulty').then(r=>r.text()),
       fetch('https://explorer.crionic.org/api/getconnectioncount').then(r=>r.text())
     ]);
+    apiOK = true;
+    statusEl.style.background = 'lime';
+    statusEl.style.boxShadow = '0 0 10px lime';
     document.getElementById('hashrate').innerText = `Hashrate: ${parseFloat(hash).toFixed(2)}`;
     document.getElementById('difficulty').innerText = `Difficulty: ${parseFloat(diff).toFixed(2)}`;
     document.getElementById('connections').innerText = `Connections: ${conn}`;
     document.getElementById('hashrate-bar').style.width = `${Math.min(parseFloat(hash)/100000000,100)}%`;
     document.getElementById('diff-bar').style.width = `${Math.min(parseFloat(diff)/10000,100)}%`;
     document.getElementById('conn-bar').style.width = `${Math.min(parseFloat(conn)*5,100)}%`;
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    apiOK = false;
+    statusEl.style.background = 'red';
+    statusEl.style.boxShadow = '0 0 10px red';
+    console.error(e);
+  }
 }
 
 async function fetchMarket() {
