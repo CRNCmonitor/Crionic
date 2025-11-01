@@ -3,239 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crionic Network Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Crionic Network Panel</title>
 <style>
-body {
-  margin: 0;
-  font-family: 'Orbitron', sans-serif;
-  background: radial-gradient(circle at bottom right, #031a1a 0%, #000000 80%);
-  color: #00ffd5;
-  overflow-x: hidden;
+html,body {
+  margin:0; padding:0; font-family:'Orbitron',sans-serif;
+  background: radial-gradient(circle at center,#0b0b0f,#000);
+  color:#00f3ff; overflow-x:hidden; height:100%;
 }
 .container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  grid-gap: 20px;
-  padding: 20px;
+  display:grid; grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,auto); gap:12px; padding:12px;
 }
 .panel {
-  background: rgba(0, 255, 200, 0.08);
-  border: 1px solid rgba(0, 255, 200, 0.3);
-  border-radius: 15px;
-  backdrop-filter: blur(12px);
-  padding: 20px;
-  box-shadow: 0 0 20px rgba(0,255,200,0.15), inset 0 0 10px rgba(0,255,200,0.1);
-  transition: transform 0.2s ease;
+  backdrop-filter: blur(12px); border:1px solid rgba(0,255,255,0.3);
+  background: rgba(255,255,255,0.06); border-radius:14px;
+  padding:14px; box-shadow:0 0 18px rgba(0,255,255,0.3);
+  transition:transform 0.3s, box-shadow 0.3s;
 }
-.panel:hover { transform: translateY(-5px); box-shadow: 0 0 30px rgba(0,255,200,0.4); }
-.title {
-  font-size: 1.3em;
-  color: #00fff2;
-  text-shadow: 0 0 10px #00ffc6;
-  margin-bottom: 10px;
+.panel:hover {transform:translateY(-3px); box-shadow:0 0 24px rgba(255,0,255,0.5);}
+h2 {font-size:1.1rem; color:#fff; margin-top:0;}
+.value {font-size:1.2rem; color:#0ff; font-weight:bold;}
+.bar {
+  height:10px; border-radius:10px; background:rgba(255,255,255,0.15);
+  overflow:hidden; margin-top:6px;
 }
-.value {
-  font-size: 1.1em;
-  margin: 5px 0;
+.fill {
+  height:100%; width:0%; border-radius:10px;
+  background:linear-gradient(90deg,#00f3ff,#ff00ff,#00ff8f);
+  background-size:200% 100%; animation:move 2s linear infinite;
 }
+@keyframes move {0%{background-position:0% 0;}100%{background-position:200% 0;}}
+.refresh {
+  position:fixed; top:8px; right:12px; font-size:0.9rem; color:#0ff; opacity:0.7;
+}
+.flag {width:24px; height:16px; cursor:pointer; margin-right:5px; border:1px solid #333;}
 button {
-  background: rgba(0,255,200,0.15);
-  border: 1px solid #00ffd5;
-  color: #00ffd5;
-  padding: 8px 15px;
-  border-radius: 8px;
-  cursor: pointer;
+  background:rgba(0,255,255,0.1); border:1px solid #00f3ff; border-radius:8px;
+  color:#fff; cursor:pointer; padding:6px 10px; margin:4px 0;
 }
-button:hover { background: rgba(0,255,200,0.3); }
-#api-status {
-  position: fixed;
-  top: 15px;
-  right: 20px;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  background: gray;
-  box-shadow: 0 0 10px gray;
-}
-#refresh-indicator {
-  position: fixed;
-  top: 15px;
-  right: 50px;
-  color: #00e6ff;
-  font-size: 0.8em;
-  opacity: 0.7;
-}
-.footer {
-  text-align: center;
-  padding: 15px;
-  font-size: 0.9em;
-  color: #00e6ff;
-}
-a { color: #00ffcc; text-decoration: none; }
-a:hover { color: #ffffff; }
-canvas { width: 100%; height: 180px; }
-input {
-  background: rgba(0,255,200,0.1);
-  border: 1px solid #00ffd5;
-  border-radius: 5px;
-  color: #00ffd5;
-  padding: 5px;
-  width: 80px;
-}
+button:hover {background:rgba(255,0,255,0.15);}
+.links a {color:#ff00ff; text-decoration:none; margin-right:8px;}
+.links a:hover {text-shadow:0 0 6px #ff00ff;}
+@keyframes pulse {0%{opacity:0.7;}50%{opacity:1;}100%{opacity:0.7;}}
+.pulse {animation:pulse 1s infinite;}
 </style>
 </head>
 <body>
-<div id="refresh-indicator">Last refresh: --</div>
-<div id="api-status" title="API Status"></div>
-
+<div class="refresh">Last update: <span id="updateTime">-</span></div>
 <div class="container">
   <div class="panel" id="network">
-    <div class="title">Network</div>
-    <div class="value" id="hashrate">Hashrate: ...</div>
-    <div class="value" id="difficulty">Difficulty: ...</div>
-    <div class="value" id="connections">Connections: ...</div>
-    <canvas id="networkChart"></canvas>
+    <h2>Network</h2>
+    <div>Hashrate: <span class="value" id="hashrate">...</span></div>
+    <div class="bar"><div class="fill" id="hashbar"></div></div>
+    <div>Difficulty: <span class="value" id="difficulty">...</span></div>
+    <div class="bar"><div class="fill" id="diffbar"></div></div>
+    <div>Connections: <span class="value" id="connections">...</span></div>
+    <div class="bar"><div class="fill" id="connbar"></div></div>
   </div>
-
   <div class="panel" id="market">
-    <div class="title">Market</div>
-    <div id="price">Price: ...</div>
-    <div id="supply">Supply: ...</div>
-    <canvas id="priceChart"></canvas>
+    <h2>Market</h2>
+    <div>Price (USD): <span class="value" id="price_usd">...</span></div>
+    <div>Price (BTC): <span class="value" id="price_btc">...</span></div>
+    <div>Supply: <span class="value" id="supply">...</span></div>
   </div>
-
-  <div class="panel" id="blockchain">
-    <div class="title">Blockchain Info</div>
-    <div id="blockcount">Block Height: ...</div>
-    <div id="hodlers">Holders: ...</div>
+  <div class="panel" id="wallet">
+    <h2>Wallet</h2>
+    <div>Address: <span style="font-size:0.8rem;color:#ccc;">KWMRuP9ExkHnGXLqUPHMxhjSzkHQYVgwtE</span></div>
+    <div>Balance: <span class="value" id="balance">...</span></div>
+    <div>Unpaid: <span class="value" id="unpaid">...</span></div>
+    <div>Total: <span class="value" id="total">...</span></div>
   </div>
-
-  <div class="panel" id="calc">
-    <div class="title">Mining Calculator</div>
-    <label>Hashrate (MH/s):</label> <input id="mh" type="number" value="100"><br><br>
-    <label>Difficulty:</label> <input id="diff" type="number" value="2000"><br><br>
-    <button onclick="calcProfit()">Calculate</button>
-    <div id="profitResult" style="margin-top:10px;">Estimated daily reward: ...</div>
-  </div>
-
   <div class="panel" id="pools">
-    <div class="title">Pools</div>
-    <ul>
-      <li><a href="https://pool.coin-miners.info" target="_blank">Coin-Miners</a></li>
-      <li><a href="https://aikapool.com" target="_blank">AikaPool</a></li>
-      <li><a href="https://mining4people.com" target="_blank">Mining4People</a></li>
-      <li><a href="https://zpool.ca" target="_blank">ZPool</a></li>
-    </ul>
+    <h2>Pools</h2>
+    <div class="links">
+      <a href="https://coin-miners.info" target="_blank">Coin-Miners</a>
+      <a href="https://aikapool.com" target="_blank">AikaPool</a>
+      <a href="https://mining4people.com" target="_blank">Mining4People</a>
+      <a href="https://zpool.ca" target="_blank">ZPool</a>
+    </div>
+    <div id="poolData">Loading...</div>
   </div>
-
-  <div class="panel" id="links">
-    <div class="title">Social & Links</div>
-    <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a><br>
-    <a href="https://x.com/CrionicCoin" target="_blank">Twitter</a><br>
-    <a href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a><br>
-    <a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex Exchange</a>
+  <div class="panel" id="explorer">
+    <h2>Explorer</h2>
+    <div>Blocks: <span class="value" id="blocks">...</span></div>
+    <div>Peers: <span class="value" id="peers">...</span></div>
+    <div>Money Supply: <span class="value" id="moneysupply">...</span></div>
+  </div>
+  <div class="panel" id="downloads">
+    <h2>Downloads</h2>
+    <button onclick="window.open('https://github.com/diabaths/Crionic-Coin/releases')">Crionic Core Wallet</button><br>
+    <button onclick="window.open('https://github.com/doktor83/SRBMiner-Multi/releases')">SRB Miner</button>
+  </div>
+  <div class="panel" id="community">
+    <h2>Community</h2>
+    <div class="links">
+      <a href="https://twitter.com" target="_blank">Twitter</a>
+      <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a>
+      <a href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a>
+      <a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex</a>
+    </div>
+  </div>
+  <div class="panel" id="lang">
+    <h2>Language</h2>
+    <img src="https://flagcdn.com/w20/gb.png" class="flag" onclick="setLang('en')" alt="English">
+    <img src="https://flagcdn.com/w20/sk.png" class="flag" onclick="setLang('sk')" alt="Slovak">
+    <div id="visitCount"></div>
   </div>
 </div>
-
-<div class="footer">Crionic Network Dashboard © 2025</div>
-
 <script>
-let priceChart, networkChart;
-let prices = [], times = [];
-let hashHistory = [], diffHistory = [];
-let apiStatus = document.getElementById('api-status');
+const walletAddr = "KWMRuP9ExkHnGXLqUPHMxhjSzkHQYVgwtE";
+const visitKey = "crionic_visits";
+let count = parseInt(localStorage.getItem(visitKey)||"0")+1;
+localStorage.setItem(visitKey,count);
+document.getElementById("visitCount").innerText = "Visits: "+count;
 
-async function fetchMarket() {
-  apiStatus.style.background = 'yellow'; apiStatus.style.boxShadow = '0 0 10px yellow';
-  try {
-    const res = await fetch('https://api.coinpaprika.com/v1/tickers/crnc-crionic');
-    const data = await res.json();
-    const price = data.quotes.USD.price;
-    document.getElementById('price').innerText = `Price: ${price.toFixed(6)} USD`;
-    document.getElementById('supply').innerText = `Supply: ${data.total_supply.toLocaleString()}`;
-    apiStatus.style.background = 'lime'; apiStatus.style.boxShadow = '0 0 10px lime';
-    const now = new Date().toLocaleTimeString();
-    if (prices.length > 30) { prices.shift(); times.shift(); }
-    prices.push(price); times.push(now);
-    updatePriceChart();
-  } catch (e) {
-    apiStatus.style.background = 'red'; apiStatus.style.boxShadow = '0 0 10px red';
-    console.error(e);
+function setLang(lang){localStorage.setItem("lang",lang);location.reload();}
+function autoLang(){let l=navigator.language.startsWith("sk")?"sk":"en";localStorage.setItem("lang",l);}
+if(!localStorage.getItem("lang")) autoLang();
+
+async function fetchJSON(url){try{let r=await fetch(url);return await r.json();}catch(e){return null;}}
+
+async function updateFast(){
+  const diff = await fetchJSON("https://explorer.crionic.org/api/getdifficulty");
+  const hash = await fetchJSON("https://explorer.crionic.org/api/getnetworkhashps");
+  const conn = await fetchJSON("https://explorer.crionic.org/api/getconnectioncount");
+  const summary = await fetchJSON("https://explorer.crionic.org/ext/getsummary");
+  if(diff) document.getElementById("difficulty").innerText = diff;
+  if(hash) document.getElementById("hashrate").innerText = parseFloat(hash/1e6).toFixed(2)+" MH/s";
+  if(conn) document.getElementById("connections").innerText = conn;
+  if(summary){
+    document.getElementById("price_usd").innerText = summary.usd+" USD";
+    document.getElementById("price_btc").innerText = summary.btc+" BTC";
   }
+  const now=new Date();document.getElementById("updateTime").innerText=now.toLocaleTimeString();
+  animateBars(diff,hash,conn);
 }
 
-function fetchNetworkSim() {
-  const h = Math.random()*5e6 + 1e6;
-  const d = Math.random()*3000 + 500;
-  const c = Math.floor(Math.random()*12)+3;
-  document.getElementById('hashrate').innerText = `Hashrate: ${h.toFixed(0)} H/s`;
-  document.getElementById('difficulty').innerText = `Difficulty: ${d.toFixed(2)}`;
-  document.getElementById('connections').innerText = `Connections: ${c}`;
-  if (hashHistory.length > 30) { hashHistory.shift(); diffHistory.shift(); }
-  hashHistory.push(h); diffHistory.push(d);
-  updateNetworkChart();
+function animateBars(diff,hash,conn){
+  const hbar=document.getElementById("hashbar");
+  const dbar=document.getElementById("diffbar");
+  const cbar=document.getElementById("connbar");
+  hbar.style.width=Math.min(100,(hash/1e7))+"%";
+  dbar.style.width=Math.min(100,(diff/100000))+"%";
+  cbar.style.width=Math.min(100,(conn*10))+"%";
 }
 
-function fetchBlockchainSim() {
-  document.getElementById('blockcount').innerText = `Block Height: ${100000 + Math.floor(Math.random()*1000)}`;
-  document.getElementById('hodlers').innerText = `Holders: ${Math.floor(Math.random()*5000)+1000}`;
+async function updateSlow(){
+  const wallet = await fetchJSON(`https://pool.coin-miners.info/api/wallet?address=${walletAddr}`);
+  const status = await fetchJSON("https://pool.coin-miners.info/api/status");
+  const money = await fetchJSON("https://explorer.crionic.org/ext/getmoneysupply");
+  const peers = await fetchJSON("https://explorer.crionic.org/ext/getnetworkpeers");
+  const blockcount = await fetchJSON("https://explorer.crionic.org/api/getblockcount");
+  if(wallet){
+    document.getElementById("balance").innerText=wallet.balance;
+    document.getElementById("unpaid").innerText=wallet.unpaid;
+    document.getElementById("total").innerText=wallet.total;
+  }
+  if(status){
+    let text="";for(let k in status){let p=status[k];
+      text+=`<div>${p.name.toUpperCase()} — ${p.workers} workers, ${(p.hashrate/1e6).toFixed(2)} MH/s</div>`;
+    }
+    document.getElementById("poolData").innerHTML=text;
+  }
+  if(money) document.getElementById("moneysupply").innerText = parseFloat(money).toFixed(0);
+  if(peers) document.getElementById("peers").innerText = peers.length || 0;
+  if(blockcount) document.getElementById("blocks").innerText = blockcount;
 }
 
-function calcProfit() {
-  const mh = parseFloat(document.getElementById('mh').value);
-  const diff = parseFloat(document.getElementById('diff').value);
-  const reward = (mh / diff) * 50; // simplified formula
-  document.getElementById('profitResult').innerText = `Estimated daily reward: ${reward.toFixed(4)} CRNC`;
-}
-
-function updateIndicator() {
-  document.getElementById('refresh-indicator').innerText = 'Last refresh: ' + new Date().toLocaleTimeString();
-}
-
-function initCharts() {
-  const ctx1 = document.getElementById('priceChart').getContext('2d');
-  const ctx2 = document.getElementById('networkChart').getContext('2d');
-  priceChart = new Chart(ctx1, {
-    type: 'line',
-    data: { labels: times, datasets: [{ label: 'Price (USD)', data: prices, borderColor: '#00ffd5', fill: false }]},
-    options: { scales: { x: { ticks: { color: '#00fff2' }}, y: { ticks: { color: '#00fff2' }}}}
-  });
-  networkChart = new Chart(ctx2, {
-    type: 'line',
-    data: { labels: Array(hashHistory.length).fill(''), datasets: [
-      { label: 'Hashrate', data: hashHistory, borderColor: '#00ffd5', fill: false },
-      { label: 'Difficulty', data: diffHistory, borderColor: '#0099ff', fill: false }
-    ]},
-    options: { scales: { x: { display: false }, y: { ticks: { color: '#00fff2' }}}}
-  });
-}
-
-function updatePriceChart() {
-  priceChart.data.labels = times;
-  priceChart.data.datasets[0].data = prices;
-  priceChart.update();
-}
-function updateNetworkChart() {
-  networkChart.data.labels = Array(hashHistory.length).fill('');
-  networkChart.data.datasets[0].data = hashHistory;
-  networkChart.data.datasets[1].data = diffHistory;
-  networkChart.update();
-}
-
-// Refresh intervals
-setInterval(fetchMarket, 1000);
-setInterval(fetchNetworkSim, 1000);
-setInterval(fetchBlockchainSim, 10000);
-setInterval(updateIndicator, 1000);
-
-// Init
-initCharts();
-fetchMarket();
-fetchNetworkSim();
-fetchBlockchainSim();
-updateIndicator();
+setInterval(updateFast,1000);
+setInterval(updateSlow,10000);
+updateFast();updateSlow();
 </script>
 </body>
 </html>
