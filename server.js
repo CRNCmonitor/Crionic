@@ -1,27 +1,32 @@
-// Jednoduchý proxy server pre Crionic Dashboard
+// Proxy server pre Crionic Dashboard (plne funkčný)
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
 
 const app = express();
 app.use(cors());
-app.use(express.static(".")); // servíruje index.html a ostatné súbory
 
-// Proxy endpoint na obídenie CORS
+// Proxy endpoint (musí byť pred static)
 app.get("/proxy", async (req, res) => {
-  const url = req.query.url;
-  if (!url) return res.status(400).send("Missing ?url=");
+  const target = req.query.url;
+  if (!target) return res.status(400).send("Missing ?url=");
+
   try {
-    const r = await fetch(url);
-    const text = await r.text();
-    res.set("Content-Type", r.headers.get("content-type") || "text/plain");
-    res.send(text);
+    const decoded = decodeURIComponent(target);
+    const response = await fetch(decoded);
+    const contentType = response.headers.get("content-type") || "text/plain";
+    res.set("Content-Type", contentType);
+    const data = await response.text();
+    res.status(response.status).send(data);
   } catch (err) {
     res.status(500).send("Proxy error: " + err.message);
   }
 });
 
+// Static files last
+app.use(express.static("."));
+
 const PORT = 8080;
 app.listen(PORT, () =>
-  console.log(`✅ Proxy server beží na http://localhost:${PORT}`)
+  console.log(`✅ Proxy beží na http://localhost:${PORT}\nPoužívaj /proxy?url=...`)
 );
