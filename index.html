@@ -27,7 +27,7 @@ html,body{height:100%;background:linear-gradient(180deg,#030406,#07080b);font-fa
     <div class="header">
       <div>
         <div class="title">Crionic Dashboard • NestEx</div>
-        <div class="sub">Privátne info z NestEx (balances, orders) — proxy na serveri</div>
+        <div class="sub">Privátne dáta z NestEx API cez bezpečný proxy server</div>
       </div>
       <div>
         <button id="btnRefresh" class="btn">Manual refresh</button>
@@ -38,9 +38,7 @@ html,body{height:100%;background:linear-gradient(180deg,#030406,#07080b);font-fa
       <div class="card">
         <div class="h3">Balances</div>
         <div id="balancesArea" class="small">Načítanie...</div>
-
         <hr style="margin:10px 0;border:none;border-top:1px dashed rgba(255,255,255,0.03)">
-
         <div class="h3">Orders (open)</div>
         <div id="ordersArea" class="small">Načítanie...</div>
       </div>
@@ -54,7 +52,7 @@ html,body{height:100%;background:linear-gradient(180deg,#030406,#07080b);font-fa
       </div>
     </div>
 
-    <div class="footer">Dbaj na bezpečnosť: API KEY/SECRET sú len na serveri (Render env vars)</div>
+    <div class="footer">Dashboard používa NestEx API (KEY/SECRET sú uložené bezpečne na serveri)</div>
   </div>
 
 <script>
