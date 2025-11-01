@@ -1,52 +1,47 @@
 {
-  "en": {
-    "lbl_network": "Network",
-    "lbl_market": "Market",
-    "lbl_pools": "Pools",
-    "lbl_explorer": "Explorer",
-    "lbl_downloads": "Downloads",
-    "lbl_links": "Community & Exchanges",
-    "lbl_summary": "Summary",
-    "lbl_tx": "Latest Transactions"
-  },
-  "sk": {
-    "lbl_network": "Sieť",
-    "lbl_market": "Trh",
-    "lbl_pools": "Pooly",
-    "lbl_explorer": "Prieskumník",
-    "lbl_downloads": "Na stiahnutie",
-    "lbl_links": "Komunita & Burzy",
-    "lbl_summary": "Súhrn",
-    "lbl_tx": "Posledné transakcie"
-  },
-  "de": {
-    "lbl_network": "Netzwerk",
-    "lbl_market": "Markt",
-    "lbl_pools": "Pools",
-    "lbl_explorer": "Explorer",
-    "lbl_downloads": "Downloads",
-    "lbl_links": "Community & Börsen",
-    "lbl_summary": "Übersicht",
-    "lbl_tx": "Letzte Transaktionen"
-  },
-  "ru": {
-    "lbl_network": "Сеть",
-    "lbl_market": "Рынок",
-    "lbl_pools": "Пулы",
-    "lbl_explorer": "Обозреватель",
-    "lbl_downloads": "Загрузки",
-    "lbl_links": "Сообщество и Биржи",
-    "lbl_summary": "Сводка",
-    "lbl_tx": "Последние транзакции"
-  },
-  "jp": {
-    "lbl_network": "ネットワーク",
-    "lbl_market": "市場",
-    "lbl_pools": "プール",
-    "lbl_explorer": "エクスプローラー",
-    "lbl_downloads": "ダウンロード",
-    "lbl_links": "コミュニティと取引所",
-    "lbl_summary": "概要",
-    "lbl_tx": "最新トランザクション"
-  }
+    "en": {
+        "network_market_title": "NETWORK & MARKET DATA",
+        "pools_explorer_title": "POOLS & EXPLORER API",
+        "hashrate_label": "Network Hashrate",
+        "difficulty_label": "Difficulty",
+        "market_price_label": "CRNC Price (USD)",
+        "block_count_label": "Block Count",
+        "connections_label": "Connections",
+        "pools_title": "Available Pools",
+        "api_docs_title": "API Documentation",
+        "wallet_download": "Crionic Core Wallet",
+        "miner_download": "SRB Miner",
+        "downloads_title": "DOWNLOADS & SOCIAL",
+        "social_title": "Connect with us",
+        "visitors_label": "Unique Visitors:",
+        "refresh_label": "Auto-Refresh:",
+        "refresh_on": "ON",
+        "refresh_off": "OFF",
+        "api_getdifficulty": "getdifficulty:",
+        "api_getblockcount": "getblockcount:"
+        // ... a ďalšie kľúče
+    },
+    "sk": {
+        "network_market_title": "DÁTA SIETE A TRHU",
+        "pools_explorer_title": "POOLY A EXPLORER API",
+        "hashrate_label": "Hashrate Siete",
+        "difficulty_label": "Obtiažnosť",
+        "market_price_label": "Cena CRNC (USD)",
+        "block_count_label": "Počet Blokov",
+        "connections_label": "Pripojenia",
+        "pools_title": "Dostupné Pooly",
+        "api_docs_title": "API Dokumentácia",
+        "wallet_download": "Peňaženka Crionic Core",
+        "miner_download": "SRB Miner",
+        "downloads_title": "SŤAHOVANIE A SOCIÁLNE SIETE",
+        "social_title": "Spojte sa s nami",
+        "visitors_label": "Unikátni Návštevníci:",
+        "refresh_label": "Auto-Obnovenie:",
+        "refresh_on": "ZAP.",
+        "refresh_off": "VYP.",
+        "api_getdifficulty": "getdifficulty:",
+        "api_getblockcount": "getblockcount:"
+        // ... a ďalšie kľúče
+    }
+    // ... Pridaj zvyšné 20+ jazykov
 }
