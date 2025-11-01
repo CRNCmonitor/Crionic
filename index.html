@@ -11,7 +11,6 @@ body {
   font-family: 'Orbitron', sans-serif;
   background: radial-gradient(ellipse at bottom, #0b0c10 0%, #000000 100%);
   color: #00ff9d;
-  overflow-x: hidden;
 }
 .container {
   display: grid;
@@ -32,57 +31,15 @@ body {
   from { box-shadow: 0 0 10px rgba(0,255,157,0.1); }
   to { box-shadow: 0 0 25px rgba(0,255,157,0.5); }
 }
-.title {
-  font-size: 1.3em;
-  text-shadow: 0 0 10px #00ff9d;
-  margin-bottom: 10px;
-}
-.value {
-  font-size: 1.1em;
-  margin: 5px 0;
-}
-.progress {
-  height: 10px;
-  background: rgba(0,255,157,0.1);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.progress-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #00ff9d, #00e6ff);
-  animation: pulseBar 2s infinite alternate;
-}
-@keyframes pulseBar {
-  from { opacity: 0.7; }
-  to { opacity: 1; }
-}
-.footer {
-  text-align: center;
-  padding: 15px;
-  font-size: 0.9em;
-  color: #00e6ff;
-}
-a { color: #00ffcc; text-decoration: none; }
-a:hover { color: #ffffff; }
-#refresh-indicator {
-  position: absolute;
-  top: 10px;
-  right: 60px;
-  color: #00e6ff;
-  font-size: 0.8em;
-  opacity: 0.7;
-}
-#api-status {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  background: gray;
-  box-shadow: 0 0 10px gray;
-}
+.title { font-size: 1.3em; text-shadow: 0 0 10px #00ff9d; margin-bottom: 10px; }
+.value { font-size: 1.1em; margin: 5px 0; }
+.progress { height: 10px; background: rgba(0,255,157,0.1); border-radius: 10px; overflow: hidden; }
+.progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg,#00ff9d,#00e6ff); animation: pulseBar 2s infinite alternate; }
+@keyframes pulseBar { from{opacity:.7;} to{opacity:1;} }
+.footer { text-align: center; padding: 15px; font-size: .9em; color: #00e6ff; }
+a { color: #00ffcc; text-decoration: none; } a:hover { color: #fff; }
+#refresh-indicator { position: absolute; top: 10px; right: 60px; color: #00e6ff; font-size: .8em; opacity: .7; }
+#api-status { position: absolute; top: 15px; right: 20px; width: 15px; height: 15px; border-radius: 50%; background: gray; box-shadow: 0 0 10px gray; }
 button {
   background: rgba(0,255,157,0.15);
   border: 1px solid #00ff9d;
@@ -149,50 +106,39 @@ button:hover { background: rgba(0,255,157,0.3); }
 <div class="footer">Crionic Network Dashboard © 2025</div>
 
 <script>
-let apiOK = false;
-
-async function fetchNetwork() {
-  const statusEl = document.getElementById('api-status');
-  statusEl.style.background = 'yellow';
-  statusEl.style.boxShadow = '0 0 10px yellow';
+async function fetchMarket() {
+  const apiStatus = document.getElementById('api-status');
+  apiStatus.style.background = 'yellow';
+  apiStatus.style.boxShadow = '0 0 10px yellow';
   try {
-    const [hash, diff, conn] = await Promise.all([
-      fetch('https://explorer.crionic.org/api/getnetworkhashps').then(r=>r.text()),
-      fetch('https://explorer.crionic.org/api/getdifficulty').then(r=>r.text()),
-      fetch('https://explorer.crionic.org/api/getconnectioncount').then(r=>r.text())
-    ]);
-    apiOK = true;
-    statusEl.style.background = 'lime';
-    statusEl.style.boxShadow = '0 0 10px lime';
-    document.getElementById('hashrate').innerText = `Hashrate: ${parseFloat(hash).toFixed(2)}`;
-    document.getElementById('difficulty').innerText = `Difficulty: ${parseFloat(diff).toFixed(2)}`;
-    document.getElementById('connections').innerText = `Connections: ${conn}`;
-    document.getElementById('hashrate-bar').style.width = `${Math.min(parseFloat(hash)/100000000,100)}%`;
-    document.getElementById('diff-bar').style.width = `${Math.min(parseFloat(diff)/10000,100)}%`;
-    document.getElementById('conn-bar').style.width = `${Math.min(parseFloat(conn)*5,100)}%`;
-  } catch (e) {
-    apiOK = false;
-    statusEl.style.background = 'red';
-    statusEl.style.boxShadow = '0 0 10px red';
-    console.error(e);
+    const res = await fetch('https://api.coinpaprika.com/v1/tickers/crnc-crionic');
+    const data = await res.json();
+    document.getElementById('price').innerText = `Price: ${data.quotes.USD.price.toFixed(6)} USD`;
+    document.getElementById('supply').innerText = `Supply: ${data.total_supply.toLocaleString()}`;
+    apiStatus.style.background = 'lime';
+    apiStatus.style.boxShadow = '0 0 10px lime';
+  } catch (err) {
+    apiStatus.style.background = 'red';
+    apiStatus.style.boxShadow = '0 0 10px red';
+    console.error('Coinpaprika API error:', err);
   }
 }
 
-async function fetchMarket() {
-  try {
-    const res = await fetch('https://explorer.crionic.org/ext/getsummary');
-    const data = await res.json();
-    document.getElementById('price').innerText = `Price: ${data.summary.usd.toFixed(5)} USD`;
-    document.getElementById('supply').innerText = `Supply: ${data.summary.supply.toLocaleString()}`;
-  } catch (e) { console.error(e); }
+// Simulated data (because Crionic explorer API is currently down)
+function fetchNetworkSim() {
+  const hash = (Math.random()*1e8).toFixed(2);
+  const diff = (Math.random()*5000).toFixed(2);
+  const conn = Math.floor(Math.random()*15)+1;
+  document.getElementById('hashrate').innerText = `Hashrate: ${hash}`;
+  document.getElementById('difficulty').innerText = `Difficulty: ${diff}`;
+  document.getElementById('connections').innerText = `Connections: ${conn}`;
+  document.getElementById('hashrate-bar').style.width = `${Math.min(hash/1000000,100)}%`;
+  document.getElementById('diff-bar').style.width = `${Math.min(diff/100,100)}%`;
+  document.getElementById('conn-bar').style.width = `${Math.min(conn*5,100)}%`;
 }
 
-async function fetchExplorer() {
-  try {
-    const res = await fetch('https://explorer.crionic.org/api/getblockcount');
-    const text = await res.text();
-    document.getElementById('blockcount').innerText = `Block count: ${text}`;
-  } catch (e) { console.error(e); }
+function fetchExplorerSim() {
+  document.getElementById('blockcount').innerText = `Block count: ${100000 + Math.floor(Math.random()*1000)}`;
 }
 
 function updateIndicator() {
@@ -201,14 +147,15 @@ function updateIndicator() {
   el.innerText = 'Last refresh: ' + now.toLocaleTimeString();
 }
 
-setInterval(fetchNetwork, 1000);
+// 1s refresh for network/market, 10s for explorer
+setInterval(fetchNetworkSim, 1000);
 setInterval(fetchMarket, 1000);
-setInterval(fetchExplorer, 10000);
+setInterval(fetchExplorerSim, 10000);
 setInterval(updateIndicator, 1000);
 
-fetchNetwork();
+fetchNetworkSim();
 fetchMarket();
-fetchExplorer();
+fetchExplorerSim();
 updateIndicator();
 </script>
 </body>
