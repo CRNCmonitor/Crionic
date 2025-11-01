@@ -7,7 +7,7 @@
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <style>
     :root{--bg:#000;--neon:#00ff66;--panel:#021;--muted:#0a3}
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--neon);font-family: 'Courier New', monospace}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--neon);font-family:'Courier New',monospace}
     .wrap{max-width:980px;margin:18px auto;padding:18px}
     header{display:flex;align-items:center;justify-content:space-between}
     h1{margin:0;font-size:22px;text-shadow:0 0 8px rgba(0,255,102,0.15)}
@@ -16,13 +16,13 @@
     button{background:transparent;border:1px solid rgba(0,255,102,0.18);padding:10px 14px;border-radius:6px;color:var(--neon);cursor:pointer}
     .status{margin-top:10px;color:var(--muted);font-size:13px}
     .grid{display:grid;grid-template-columns:1fr 420px;gap:16px;margin-top:16px}
-    .card{background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4));border:1px solid rgba(0,255,102,0.06);padding:12px;border-radius:8px;box-shadow:0 6px 24px rgba(0,255,102,0.03)}
+    .card{background:linear-gradient(180deg,rgba(0,0,0,0.6),rgba(0,0,0,0.4));border:1px solid rgba(0,255,102,0.06);padding:12px;border-radius:8px;box-shadow:0 6px 24px rgba(0,255,102,0.03)}
     .small{font-size:13px;color:var(--muted)}
     table{width:100%;border-collapse:collapse;margin-top:8px}
     th,td{padding:8px;text-align:left;font-size:13px;border-bottom:1px solid rgba(0,255,102,0.03)}
     th{color:rgba(0,255,102,0.9)}
     .badge{display:inline-block;padding:6px 10px;border-radius:6px;background:rgba(0,255,102,0.03);border:1px solid rgba(0,255,102,0.06);font-size:13px}
-    .ref{display:inline-block;margin-right:8px;padding:8px 12px;border-radius:6px;background:transparent;border:1px solid rgba(0,255,102,0.08);color:var(--neon);text-decoration:none}
+    .ref{display:inline-block;margin:6px;padding:8px 12px;border-radius:6px;background:transparent;border:1px solid rgba(0,255,102,0.08);color:var(--neon);text-decoration:none}
     .center{text-align:center}
     .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,255,102,0.12);border-top-color:var(--neon);border-radius:50%;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px}
     @keyframes spin{to{transform:rotate(360deg)}}
@@ -41,6 +41,68 @@
     </header>
 
     <div id="status" class="status">Ready. Služby: Ethplorer (freekey) • CoinGecko • Public RPC.</div>
+    <div class="grid">
+      <div class="card">
+        <div class="small">Výsledky sa zobrazia tu po kliknutí na Check</div>
+        <div id="output"></div>
+      </div>
+      <div class="card center">
+        <strong>Partneri</strong><br>
+        <a class="ref" href="https://partner.bydfi.com/register?vipCode=Jg9qYE" target="_blank">BYDFI</a>
+        <a class="ref" href="https://www.bitunix.com/register?vipCode=SATTO" target="_blank">Bitunix</a>
+      </div>
+    </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.3/dist/ethers.min.js"></script>
+  <script>
+    const ETH_RPC = 'https://cloudflare-eth.com';
+    const ETHPLORER = 'https://api.ethplorer.io/getAddressInfo/';
+    const COINGECKO = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
+    const btn = document.getElementById('check');
+    const addrInput = document.getElementById('addr');
+    const status = document.getElementById('status');
+    const out = document.getElementById('output');
+
+    function setStatus(msg, busy=false){
+      status.innerHTML = busy ? '<span class="spinner"></span>' + msg : msg;
+    }
+
+    async function fetchJSON(url){ try{const r = await fetch(url); return await r.json();}catch(e){return null;} }
+
+    async function analyze(addr){
+      setStatus('Načítavam dáta...', true);
+      const ethData = await fetchJSON(`${ETHPLORER}${addr}?apiKey=freekey`);
+      const priceData = await fetchJSON(COINGECKO);
+      if(!ethData || !priceData){ setStatus('Nepodarilo sa načítať údaje.'); return; }
+
+      const ethPrice = priceData.ethereum.usd;
+      const provider = new ethers.JsonRpcProvider(ETH_RPC);
+      const bal = await provider.getBalance(addr);
+      const ethBalance = Number(ethers.formatUnits(bal, 18));
+      const usdValue = (ethBalance * ethPrice).toFixed(2);
+
+      let html = `<div><b>ETH balance:</b> ${ethBalance} ETH ≈ ${usdValue} USD</div>`;
+      if(ethData.tokens){
+        html += '<table><thead><tr><th>Token</th><th>Symbol</th><th>Balance</th></tr></thead><tbody>';
+        ethData.tokens.slice(0,10).forEach(t=>{
+          const info = t.tokenInfo||{};
+          const dec = info.decimals? Number(info.decimals):0;
+          const bal = dec? Number(t.balance)/Math.pow(10,dec):Number(t.balance);
+          html += `<tr><td>${info.name||'?'}</td><td>${info.symbol||''}</td><td>${bal.toFixed(4)}</td></tr>`;
+        });
+        html += '</tbody></table>';
+      }
+      out.innerHTML = html;
+      setStatus('Hotovo.');
+    }
+
+    btn.onclick = ()=> {
+      const addr = addrInput.value.trim();
+      if(!addr){ setStatus('Zadaj ETH adresu.'); return; }
+      analyze(addr);
+    };
+    addrInput.addEventListener('keyup', e=>{ if(e.key==='Enter') btn.click(); });
+  </script>
 </body>
 </html>
