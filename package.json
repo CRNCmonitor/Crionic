@@ -1,0 +1,10 @@
+{
+  "name": "wallet-watcher",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npx html-minifier-terser index.html -o dist/index.html"
+  },
+  "dependencies": {
+    "html-minifier-terser": "^7.2.0"
+  }
+}

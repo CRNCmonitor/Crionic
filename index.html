@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wallet Watcher — Matrix Pro</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <style>
+    :root{--bg:#000;--neon:#00ff66;--panel:#021;--muted:#0a3}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--neon);font-family: 'Courier New', monospace}
+    .wrap{max-width:980px;margin:18px auto;padding:18px}
+    header{display:flex;align-items:center;justify-content:space-between}
+    h1{margin:0;font-size:22px;text-shadow:0 0 8px rgba(0,255,102,0.15)}
+    .controls{display:flex;gap:10px;align-items:center}
+    input{background:transparent;border:1px solid rgba(0,255,102,0.08);padding:10px;border-radius:6px;color:var(--neon);min-width:320px}
+    button{background:transparent;border:1px solid rgba(0,255,102,0.18);padding:10px 14px;border-radius:6px;color:var(--neon);cursor:pointer}
+    .status{margin-top:10px;color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:16px;margin-top:16px}
+    .card{background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4));border:1px solid rgba(0,255,102,0.06);padding:12px;border-radius:8px;box-shadow:0 6px 24px rgba(0,255,102,0.03)}
+    .small{font-size:13px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:8px;text-align:left;font-size:13px;border-bottom:1px solid rgba(0,255,102,0.03)}
+    th{color:rgba(0,255,102,0.9)}
+    .badge{display:inline-block;padding:6px 10px;border-radius:6px;background:rgba(0,255,102,0.03);border:1px solid rgba(0,255,102,0.06);font-size:13px}
+    .ref{display:inline-block;margin-right:8px;padding:8px 12px;border-radius:6px;background:transparent;border:1px solid rgba(0,255,102,0.08);color:var(--neon);text-decoration:none}
+    .center{text-align:center}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,255,102,0.12);border-top-color:var(--neon);border-radius:50%;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+    @media(max-width:900px){.grid{grid-template-columns:1fr;}.controls{flex-direction:column;align-items:stretch}input{min-width:unset;width:100%}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Wallet Watcher — Matrix Pro</h1>
+      <div class="controls">
+        <input id="addr" placeholder="Vlož ETH adresu... napr. 0x123..." spellcheck="false">
+        <button id="check">Check</button>
+      </div>
+    </header>
+
+    <div id="status" class="status">Ready. Služby: Ethplorer (freekey) • CoinGecko • Public RPC.</div>
+  </div>
+</body>
+</html>
