@@ -1,154 +1,199 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Crionic Network – Live Explorer & Stats Dashboard</title>
-<link rel="icon" href="https://explorer.crionic.org/favicon.ico">
+<title>CRIONIC NETWORK — Live Explorer & Stats Dashboard</title>
 <style>
-  /* === GLOBAL THEME === */
-  html,body {margin:0;padding:0;height:100%;overflow-x:hidden;background:#020305;font-family:'Orbitron',system-ui;color:#d9ffe6;}
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap');
-  body {
-    background: linear-gradient(-45deg,#041e28,#000000,#062f1d,#05152d);
-    background-size: 400% 400%;
-    animation: gradientMove 16s ease infinite;
-  }
-  @keyframes gradientMove {
-    0% {background-position:0% 50%;}
-    50% {background-position:100% 50%;}
-    100% {background-position:0% 50%;}
-  }
-
-  h1,h2,h3{font-family:'Orbitron',sans-serif;}
-  a{color:#00ffc6;text-decoration:none;}
-  a:hover{text-shadow:0 0 6px #00ffc6;}
-  .glow{color:#00ffc6;text-shadow:0 0 10px #00ffc6,0 0 20px #00ffc6;}
-  .glass{
-    background:rgba(15,25,25,0.45);
-    backdrop-filter:blur(6px);
-    border:1px solid rgba(0,255,200,0.3);
-    border-radius:14px;
-    box-shadow:0 0 20px rgba(0,255,200,0.15);
-  }
-  .grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-    gap:16px;padding:16px;
-  }
-
-  header{
-    text-align:center;padding:30px 10px;position:relative;overflow:hidden;
-  }
-  .header-title{
-    font-size:2.2rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;
-    animation:pulseGlow 3s infinite alternate;
-  }
-  .header-sub{
-    font-size:1rem;color:#9ef8ff;letter-spacing:1.2px;margin-top:6px;
-  }
-  @keyframes pulseGlow{
-    from{text-shadow:0 0 8px #00ffc6,0 0 20px #00ffc6;}
-    to{text-shadow:0 0 16px #00ffe1,0 0 40px #00ffe1;}
-  }
-  .flagbar{
-    display:flex;justify-content:center;gap:10px;margin:10px 0 20px;
-    flex-wrap:wrap;
-  }
-  .flagbar img{
-    width:28px;height:20px;border:1px solid #00ffc6;border-radius:3px;cursor:pointer;transition:transform .2s;
-  }
-  .flagbar img:hover{transform:scale(1.2);}
-  .section{padding:10px;}
-  .kpi{margin:6px 0;padding:8px;border-bottom:1px solid rgba(0,255,200,0.1);}
-  .label{color:#90fcd1;font-size:14px;}
-  .val{font-size:17px;font-weight:600;}
-  footer{text-align:center;padding:20px;color:#60bfa8;font-size:13px;}
-  canvas{width:100%!important;height:200px!important;}
+/* === Futuristic Neon Theme === */
+:root {
+  --bg1: #05070b;
+  --bg2: #0b1420;
+  --neon1: #00ffaa;
+  --neon2: #00ccff;
+  --text: #e7fff8;
+  --muted: #7bd4c3;
+  --card-bg: rgba(10,20,30,0.45);
+  --border: rgba(0,255,170,0.3);
+}
+html,body{
+  margin:0;
+  font-family: 'Segoe UI',Roboto,Ubuntu,sans-serif;
+  color:var(--text);
+  background:linear-gradient(-45deg,var(--bg1),var(--bg2),#060b12,#09131d);
+  background-size:400% 400%;
+  animation: moveBg 15s ease infinite;
+  overflow-x:hidden;
+}
+@keyframes moveBg {
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+header{
+  text-align:center;
+  padding:40px 10px 25px;
+}
+h1{
+  font-size:36px;
+  letter-spacing:3px;
+  background:linear-gradient(90deg,var(--neon1),var(--neon2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  from{text-shadow:0 0 10px var(--neon1);}
+  to{text-shadow:0 0 20px var(--neon2),0 0 40px var(--neon2);}
+}
+h2{margin-top:0;font-size:20px;color:var(--neon1);}
+.grid{display:grid;gap:15px;padding:0 15px 30px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));}
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 0 15px rgba(0,255,200,0.15);
+  backdrop-filter: blur(10px);
+  transition:transform .3s, box-shadow .3s;
+}
+.card:hover{transform:translateY(-3px);box-shadow:0 0 25px rgba(0,255,255,0.4);}
+.kpi{margin:8px 0;}
+.label{color:var(--muted);font-size:13px;}
+.val{font-size:18px;font-family:monospace;}
+footer{text-align:center;font-size:12px;color:var(--muted);padding:10px;}
+.flagbar{text-align:center;margin:10px;}
+.flagbar img{width:26px;height:18px;margin:3px;cursor:pointer;opacity:0.8;transition:transform .2s;}
+.flagbar img:hover{opacity:1;transform:scale(1.15);}
+.twitter{color:var(--neon2);}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="header-title glow">CRIONIC NETWORK</div>
-  <div class="header-sub">Live Explorer & Stats Dashboard</div>
+  <h1>CRIONIC NETWORK</h1>
+  <div>Live Explorer & Stats Dashboard</div>
+  <div style="margin-top:10px;font-size:14px;color:var(--muted);">
+    Auto refresh every 30s • <span id="lastUpdated">–</span>
+  </div>
   <div class="flagbar" id="flags">
-    <!-- vlajky (výber jazykov) -->
-    <img src="https://flagcdn.com/w20/us.png" title="English">
-    <img src="https://flagcdn.com/w20/de.png" title="Deutsch">
-    <img src="https://flagcdn.com/w20/fr.png" title="Français">
-    <img src="https://flagcdn.com/w20/jp.png" title="日本語">
-    <img src="https://flagcdn.com/w20/in.png" title="India">
-    <img src="https://flagcdn.com/w20/tw.png" title="Taiwan">
-    <img src="https://flagcdn.com/w20/nl.png" title="Nederlands">
-    <img src="https://flagcdn.com/w20/ru.png" title="Русский">
-    <img src="https://flagcdn.com/w20/ua.png" title="Українська">
-    <img src="https://flagcdn.com/w20/gb.png" title="English UK">
-    <img src="https://flagcdn.com/w20/pl.png" title="Polski">
-    <img src="https://flagcdn.com/w20/it.png" title="Italiano">
-    <img src="https://flagcdn.com/w20/br.png" title="Português (BR)">
-    <img src="https://flagcdn.com/w20/th.png" title="ไทย">
-    <img src="https://flagcdn.com/w20/bg.png" title="Български">
+    <img src="https://flagcdn.com/24x18/us.png" title="English">
+    <img src="https://flagcdn.com/24x18/de.png" title="German">
+    <img src="https://flagcdn.com/24x18/fr.png" title="French">
+    <img src="https://flagcdn.com/24x18/jp.png" title="Japanese">
+    <img src="https://flagcdn.com/24x18/in.png" title="Hindi">
+    <img src="https://flagcdn.com/24x18/ru.png" title="Russian">
+    <img src="https://flagcdn.com/24x18/pl.png" title="Polish">
+    <img src="https://flagcdn.com/24x18/br.png" title="Portuguese (BR)">
+    <img src="https://flagcdn.com/24x18/it.png" title="Italian">
+    <img src="https://flagcdn.com/24x18/ca.png" title="Canadian English">
   </div>
 </header>
 
 <main class="grid">
-  <section class="glass section">
-    <h2 class="glow">Network</h2>
-    <div class="kpi"><span class="label">Latest Block:</span> <span id="blk" class="val">...</span></div>
-    <div class="kpi"><span class="label">Difficulty:</span> <span id="diff" class="val">...</span></div>
-    <div class="kpi"><span class="label">Hashrate:</span> <span id="hash" class="val">...</span></div>
-    <div class="kpi"><span class="label">Connections:</span> <span id="conn" class="val">...</span></div>
-    <div class="kpi"><span class="label">Money Supply:</span> <span id="supply" class="val">...</span></div>
+  <section class="card">
+    <h2>Network</h2>
+    <div class="kpi"><span class="label">Last Block:</span> <span class="val" id="block">–</span></div>
+    <div class="kpi"><span class="label">Difficulty:</span> <span class="val" id="diff">–</span></div>
+    <div class="kpi"><span class="label">Hashrate:</span> <span class="val" id="hash">–</span></div>
+    <div class="kpi"><span class="label">Connections:</span> <span class="val" id="conn">–</span></div>
   </section>
 
-  <section class="glass section">
-    <h2 class="glow">Market</h2>
-    <div class="kpi"><span class="label">Price (USD):</span> <span id="price" class="val">...</span></div>
-    <div class="kpi"><span class="label">24h Volume:</span> <span id="vol" class="val">...</span></div>
-    <div class="kpi"><span class="label">Change 24h:</span> <span id="chg" class="val">...</span></div>
-    <canvas id="chart"></canvas>
+  <section class="card">
+    <h2>Market</h2>
+    <div class="kpi"><span class="label">Price (USD):</span> <span class="val" id="price">–</span></div>
+    <div class="kpi"><span class="label">Volume (24h):</span> <span class="val" id="vol">–</span></div>
+    <div class="kpi"><span class="label">Change (24h):</span> <span class="val" id="chg">–</span></div>
   </section>
 
-  <section class="glass section">
-    <h2 class="glow">Explorer API</h2>
-    <div id="apiResults" style="font-size:14px;line-height:1.4;"></div>
+  <section class="card">
+    <h2>Explorer API Summary</h2>
+    <div class="kpi"><span class="label">Money Supply:</span> <span class="val" id="supply">–</span></div>
+    <div class="kpi"><span class="label">Network Peers:</span> <span class="val" id="peers">–</span></div>
+    <div class="kpi"><span class="label">Summary Hashrate:</span> <span class="val" id="sumhash">–</span></div>
+    <div class="kpi"><span class="label">Block Count:</span> <span class="val" id="sumblock">–</span></div>
   </section>
 
-  <section class="glass section">
-    <h2 class="glow">Pools / Community</h2>
-    <div><a href="https://pool.coin-miners.info/" target="_blank">coin-miners.info</a> |
-         <a href="https://aikapool.com/" target="_blank">aikapool.com</a> |
-         <a href="https://mining4people.com/" target="_blank">mining4people.com</a></div>
-    <div><a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a> |
-         <a href="https://x.com/Crionic_coin" target="_blank">Twitter</a> |
-         <a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex Exchange</a></div>
+  <section class="card">
+    <h2>Pools</h2>
+    <div class="kpi"><span class="label">Workers:</span> <span class="val" id="poolwork">–</span></div>
+    <div class="kpi"><span class="label">Hashrate:</span> <span class="val" id="poolhash">–</span></div>
+    <div class="label">coin-miners.info • aikapool.com • mining4people.com • zpool.ca</div>
+  </section>
+
+  <section class="card">
+    <h2>Wallet Status</h2>
+    <input id="walletAddr" placeholder="Enter CRNC wallet address" style="width:100%;padding:6px;border-radius:8px;border:1px solid var(--neon1);background:rgba(0,0,0,0.3);color:var(--text);">
+    <button id="btnWallet" style="margin-top:6px;padding:6px 12px;border:0;border-radius:8px;background:var(--neon1);color:#000;font-weight:bold;cursor:pointer;">Check</button>
+    <pre id="walletOut" style="white-space:pre-wrap;margin-top:8px;font-family:monospace;font-size:13px;"></pre>
+  </section>
+
+  <section class="card">
+    <h2>Social & Exchanges</h2>
+    <div><a class="twitter" href="https://x.com/Crionic_coin" target="_blank">Twitter @Crionic_coin</a></div>
+    <div><a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord Community</a></div>
+    <div><a href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a></div>
+    <div><a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex CRNC/USDT</a></div>
+    <div><a href="https://explorer.crionic.org" target="_blank">Explorer.crionic.org</a></div>
   </section>
 </main>
 
 <footer>
-  Auto-refresh every 30s | Explorer: explorer.crionic.org | CoinPaprika: crnc-crionic
+  © 2025 CRIONIC NETWORK — Live Explorer Dashboard. Data auto-updated every 30s.
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 async function getJSON(url){try{const r=await fetch(url);return await r.json();}catch{return null;}}
-async function updateData(){
-  let diff=await getJSON("https://explorer.crionic.org/api/getdifficulty");
-  let blk=await getJSON("https://explorer.crionic.org/api/getblockcount");
-  let hash=await getJSON("https://explorer.crionic.org/api/getnetworkhashps");
-  let conn=await getJSON("https://explorer.crionic.org/api/getconnectioncount");
-  let supply=await getJSON("https://explorer.crionic.org/ext/getmoneysupply");
-  document.getElementById("blk").textContent=blk||"N/A";
-  document.getElementById("diff").textContent=diff||"N/A";
-  document.getElementById("hash").textContent=hash?Number(hash).toLocaleString()+" H/s":"N/A";
-  document.getElementById("conn").textContent=conn||"N/A";
-  document.getElementById("supply").textContent=supply||"N/A";
-  // show all APIs summary
-  let sum=await getJSON("https://explorer.crionic.org/ext/getsummary");
-  if(sum){let o="";for(let [k,v] of Object.entries(sum))o+=`<div><b>${k}</b>: ${v}</div>`;document.getElementById("apiResults").innerHTML=o;}
-}
-updateData();setInterval(updateData,30000);
-</script>
 
+async function refreshData(){
+  const blk=await getJSON("https://explorer.crionic.org/api/getblockcount");
+  document.getElementById("block").textContent=blk||"N/A";
+
+  const diff=await getJSON("https://explorer.crionic.org/api/getdifficulty");
+  document.getElementById("diff").textContent=(typeof diff==="number"?diff.toFixed(3):"N/A");
+
+  const hash=await getJSON("https://explorer.crionic.org/api/getnetworkhashps");
+  document.getElementById("hash").textContent=hash?Number(hash).toLocaleString()+" H/s":"N/A";
+
+  const conn=await getJSON("https://explorer.crionic.org/api/getconnectioncount");
+  document.getElementById("conn").textContent=conn||"N/A";
+
+  const sum=await getJSON("https://explorer.crionic.org/ext/getsummary");
+  if(sum){
+    document.getElementById("supply").textContent=sum.moneysupply||"N/A";
+    document.getElementById("peers").textContent=sum.connections||"N/A";
+    document.getElementById("sumhash").textContent=sum.hashrate||"N/A";
+    document.getElementById("sumblock").textContent=sum.blockcount||"N/A";
+  }
+
+  const tick=await getJSON("https://api.coinpaprika.com/v1/tickers/crnc-crionic");
+  if(tick&&tick.quotes&&tick.quotes.USD){
+    document.getElementById("price").textContent="$"+tick.quotes.USD.price.toFixed(6);
+    document.getElementById("vol").textContent="$"+tick.quotes.USD.volume_24h.toLocaleString();
+    document.getElementById("chg").textContent=tick.quotes.USD.percent_change_24h.toFixed(2)+"%";
+  }
+
+  const pool=await getJSON("https://pool.coin-miners.info/api/status");
+  if(pool){
+    let totalW=0,totalH=0;
+    Object.values(pool).forEach(p=>{if(p.workers)totalW+=p.workers;if(p.hashrate)totalH+=p.hashrate;});
+    document.getElementById("poolwork").textContent=totalW;
+    document.getElementById("poolhash").textContent=totalH.toLocaleString()+" H/s";
+  }
+
+  document.getElementById("lastUpdated").textContent=new Date().toLocaleTimeString();
+}
+refreshData();
+setInterval(refreshData,30000);
+
+document.getElementById("btnWallet").onclick=async()=>{
+  const addr=document.getElementById("walletAddr").value.trim();
+  if(!addr){document.getElementById("walletOut").textContent="Enter address";return;}
+  document.getElementById("walletOut").textContent="Loading...";
+  const res=await getJSON("https://pool.coin-miners.info/api/walletEx?address="+addr);
+  if(!res){document.getElementById("walletOut").textContent="Error or no data";return;}
+  const text=Object.entries(res).map(([k,v])=>`${k}: ${JSON.stringify(v)}`).join("\\n");
+  document.getElementById("walletOut").textContent=text;
+};
+</script>
 </body>
 </html>
