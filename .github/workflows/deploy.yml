@@ -1,0 +1,33 @@
+name: Minify and Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install HTML minifier
+        run: npm install -g html-minifier-terser
+
+      - name: Minify HTML
+        run: |
+          mkdir -p dist
+          npx html-minifier-terser index.html             --collapse-whitespace             --remove-comments             --remove-optional-tags             --minify-css true             --minify-js true             -o dist/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
