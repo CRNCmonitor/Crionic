@@ -1,4 +1,4 @@
-// Proxy server pre Crionic Dashboard (plne funkčný)
+// Proxy server pre Crionic dashboard - len pre CoinPaprika (alebo ľubovoľné URL cez ?url=)
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
@@ -6,11 +6,10 @@ import cors from "cors";
 const app = express();
 app.use(cors());
 
-// Proxy endpoint (musí byť pred static)
+// Proxy endpoint (pred static)
 app.get("/proxy", async (req, res) => {
   const target = req.query.url;
   if (!target) return res.status(400).send("Missing ?url=");
-
   try {
     const decoded = decodeURIComponent(target);
     const response = await fetch(decoded);
@@ -23,10 +22,10 @@ app.get("/proxy", async (req, res) => {
   }
 });
 
-// Static files last
+// Serve static files (index.html)
 app.use(express.static("."));
 
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () =>
-  console.log(`✅ Proxy beží na http://localhost:${PORT}\nPoužívaj /proxy?url=...`)
+  console.log(`✅ Proxy beží na http://localhost:${PORT} (servuje index.html, proxy: /proxy?url=...)`)
 );
