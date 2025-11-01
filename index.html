@@ -5,58 +5,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crionic Network Monitor</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 body {
-  margin: 0; font-family: 'Orbitron', sans-serif; background: radial-gradient(ellipse at top, #050505, #000);
-  color: #0f0; overflow-x: hidden;
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(180deg,#020202 0%,#040404 100%);
+  color: #00ffcc;
+  overflow-x: hidden;
 }
-.container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
+h2 {
+  text-align: center;
+  margin-top: 15px;
+  color: #00ffc3;
+  text-shadow: 0 0 20px #00ffc3, 0 0 40px #00ffc3;
+}
+.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 20px;
+}
 .panel {
-  background: rgba(25,25,25,0.3); backdrop-filter: blur(10px); border: 1px solid #0f0;
-  border-radius: 12px; padding: 15px; box-shadow: 0 0 20px #0f0 inset, 0 0 10px #0f0;
-  transition: 0.3s; animation: pulse 4s infinite alternate;
+  background: rgba(15,15,15,0.4);
+  border: 1px solid #00ffc3;
+  border-radius: 14px;
+  padding: 15px;
+  box-shadow: 0 0 15px #00ffc3 inset, 0 0 10px #00ffc3;
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s;
 }
-@keyframes pulse { from {box-shadow: 0 0 10px #0f0;} to {box-shadow: 0 0 25px #0f0;} }
-h2 { text-align: center; color: #00ffae; text-shadow: 0 0 8px #00ffae; }
+.panel:hover { transform: scale(1.02); }
 .progress {
-  height: 10px; background: rgba(0,255,0,0.1); border-radius: 5px; overflow: hidden; margin-top: 5px;
+  height: 8px;
+  background: rgba(0,255,195,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 5px 0;
 }
-.progress div { height: 100%; width: 0; background: linear-gradient(90deg,#0f0,#00ffff); animation: flow 2s infinite linear; }
-@keyframes flow { 0%{transform: translateX(-100%);} 100%{transform: translateX(100%);} }
-button, a.btn {
-  display: inline-block; padding: 10px 15px; margin: 5px; color: #0f0; background: rgba(0,0,0,0.5);
-  border: 1px solid #0f0; border-radius: 8px; text-decoration: none; transition: 0.3s;
+.progress div {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg,#00ffc3,#0066ff);
+  animation: slide 2s infinite linear;
 }
-button:hover, a.btn:hover { background: #0f0; color: #000; }
-footer { text-align: center; margin-top: 20px; color: #999; font-size: 0.9em; }
-.lang-flags img { width: 30px; height: 20px; margin: 2px; cursor: pointer; border: 1px solid #0f0; }
-.neon { color: #0ff; text-shadow: 0 0 10px #0ff; }
+@keyframes slide {
+  0% {transform: translateX(-100%);}
+  100% {transform: translateX(100%);}
+}
+a.btn, button {
+  display: inline-block;
+  padding: 8px 12px;
+  margin: 5px;
+  color: #00ffc3;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid #00ffc3;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+a.btn:hover, button:hover {
+  background: #00ffc3;
+  color: #000;
+}
+footer {
+  text-align: center;
+  margin-top: 25px;
+  color: #777;
+  font-size: 0.9em;
+}
+.lang-flags img {
+  width: 30px;
+  height: 20px;
+  margin: 2px;
+  cursor: pointer;
+  border: 1px solid #00ffc3;
+}
 </style>
 </head>
-
 <body>
-<h2 class="neon">⚡ Crionic Network Monitor ⚡</h2>
-
-<div class="lang-flags" id="lang-flags"></div>
+<h2>⚡ CRIONIC NETWORK MONITOR ⚡</h2>
+<div class="lang-flags" id="langFlags"></div>
 
 <div class="container">
   <div class="panel" id="network">
     <h3>Network</h3>
     <div>Hashrate: <span id="hashrate">Loading...</span></div>
-    <div class="progress"><div id="hashrateBar"></div></div>
+    <div class="progress"><div id="hashBar"></div></div>
     <div>Difficulty: <span id="difficulty">Loading...</span></div>
     <div class="progress"><div id="diffBar"></div></div>
     <div>Connections: <span id="connections">Loading...</span></div>
     <div class="progress"><div id="connBar"></div></div>
+    <div>Blocks: <span id="blocks">Loading...</span></div>
   </div>
 
   <div class="panel" id="market">
     <h3>Market</h3>
-    <div>Price: <span id="price">Loading...</span></div>
-    <div>Volume 24h: <span id="volume">Loading...</span></div>
+    <div>Price USD: <span id="price_usd">Loading...</span></div>
+    <div>Price BTC: <span id="price_btc">Loading...</span></div>
+    <div>Money Supply: <span id="supply">Loading...</span></div>
   </div>
 
   <div class="panel" id="pools">
-    <h3>Mining Pools</h3>
+    <h3>Pools</h3>
     <ul>
       <li><a href="https://coin-miners.info" target="_blank">Coin-Miners</a></li>
       <li><a href="https://aikapool.com" target="_blank">Aikapool</a></li>
@@ -85,69 +135,89 @@ footer { text-align: center; margin-top: 20px; color: #999; font-size: 0.9em; }
   </div>
 
   <div class="panel" id="stats">
-    <h3>Pools Summary</h3>
-    <div id="poolStatus">Loading...</div>
+    <h3>Summary</h3>
+    <div id="summary">Loading...</div>
   </div>
 </div>
 
 <footer>© 2025 Crionic Network Monitor</footer>
 
 <script>
-// ---------- MULTI-LANGUAGE DETECTION ----------
-const languages = ['en','de','fr','ru','jp','pl','it','br','in','tw','ua','nl','th','bg','srb','ca','uk','dom','khm','lv','md','by'];
-const langFlagsDiv = document.getElementById("lang-flags");
-languages.forEach(l => {
-  const img = document.createElement('img');
-  img.src = `https://flagcdn.com/24x18/${l.slice(0,2)}.png`;
-  img.onclick = () => changeLang(l);
-  langFlagsDiv.appendChild(img);
+// ------------------- LANGUAGES -------------------
+const translations = {
+  en: {Network:"Network",Market:"Market",Pools:"Pools",Explorer:"Explorer API",Downloads:"Downloads",Community:"Community & Exchanges",Summary:"Summary",Blocks:"Blocks",Hashrate:"Hashrate",Difficulty:"Difficulty",Connections:"Connections",PriceUSD:"Price USD",PriceBTC:"Price BTC",MoneySupply:"Money Supply"},
+  sk: {Network:"Sieť",Market:"Trh",Pools:"Pooly",Explorer:"Prieskumník",Downloads:"Na stiahnutie",Community:"Komunita & Burzy",Summary:"Súhrn",Blocks:"Bloky",Hashrate:"Výpočtový výkon",Difficulty:"Obtiažnosť",Connections:"Spojenia",PriceUSD:"Cena USD",PriceBTC:"Cena BTC",MoneySupply:"Objem meny"}
+};
+const supportedLangs=['en','sk','de','fr','ru','jp'];
+const langFlags=document.getElementById('langFlags');
+supportedLangs.forEach(l=>{
+  const img=document.createElement('img');
+  img.src=`https://flagcdn.com/24x18/${l}.png`;
+  img.onclick=()=>setLang(l);
+  langFlags.appendChild(img);
 });
-function changeLang(l){ localStorage.setItem('lang',l); alert('Language set to '+l.toUpperCase()); }
-let userLang = (navigator.language || 'en').slice(0,2);
-if(languages.includes(userLang)) changeLang(userLang);
+function setLang(l){localStorage.setItem('lang',l);location.reload();}
+let lang=localStorage.getItem('lang')||navigator.language.slice(0,2);
+if(!supportedLangs.includes(lang))lang='en';
+function t(k){return translations[lang][k]||k;}
+// apply translation on UI
+document.querySelectorAll('h3').forEach(el=>{
+  let key=el.textContent.trim();
+  if(translations[lang][key])el.textContent=t(key);
+});
 
-// ---------- LIVE DATA FETCHING ----------
-async function fetchNetwork() {
-  try {
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=crionic&vs_currencies=usd');
-    const data = await res.json();
-    document.getElementById('price').innerText = data.crionic?.usd ? `$${data.crionic.usd}` : 'N/A';
-    document.getElementById('hashrate').innerText = (Math.random()*100).toFixed(2)+' GH/s';
-    document.getElementById('difficulty').innerText = (Math.random()*10000).toFixed(0);
-    document.getElementById('connections').innerText = Math.floor(Math.random()*40+10);
-    updateBars();
-  } catch (e) { console.error(e); }
+// ------------------- FETCH DATA -------------------
+async function fetchNetwork(){
+  try{
+    const [diff,conn,hash,block]=await Promise.all([
+      fetch('https://explorer.crionic.org/api/getdifficulty').then(r=>r.text()),
+      fetch('https://explorer.crionic.org/api/getconnectioncount').then(r=>r.text()),
+      fetch('https://explorer.crionic.org/api/getnetworkhashps').then(r=>r.text()),
+      fetch('https://explorer.crionic.org/api/getblockcount').then(r=>r.text())
+    ]);
+    document.getElementById('hashrate').textContent=(Number(hash)/1e6).toFixed(2)+' MH/s';
+    document.getElementById('difficulty').textContent=Number(diff).toFixed(2);
+    document.getElementById('connections').textContent=conn;
+    document.getElementById('blocks').textContent=block;
+    document.getElementById('hashBar').style.width=(Math.random()*100)+'%';
+    document.getElementById('diffBar').style.width=(Math.random()*100)+'%';
+    document.getElementById('connBar').style.width=(Math.random()*100)+'%';
+  }catch(e){console.error(e);}
 }
 
-function updateBars(){
-  const h = Math.random()*100, d = Math.random()*100, c = Math.random()*100;
-  document.getElementById('hashrateBar').style.width = h+'%';
-  document.getElementById('diffBar').style.width = d+'%';
-  document.getElementById('connBar').style.width = c+'%';
+async function fetchMarket(){
+  try{
+    const [price,supply]=await Promise.all([
+      fetch('https://explorer.crionic.org/ext/getcurrentprice').then(r=>r.text()),
+      fetch('https://explorer.crionic.org/ext/getmoneysupply').then(r=>r.text())
+    ]);
+    document.getElementById('price_usd').textContent='$'+Number(price).toFixed(6);
+    document.getElementById('price_btc').textContent=(Number(price)/70000).toFixed(8)+' BTC';
+    document.getElementById('supply').textContent=parseFloat(supply).toLocaleString();
+  }catch(e){console.error(e);}
 }
 
-async function fetchPools() {
-  try {
-    const res = await fetch('https://pool.coin-miners.info/api/status');
-    const data = await res.json();
-    document.getElementById('poolStatus').innerText = 'x11 hashrate: '+data.x11.hashrate+' | workers: '+data.x11.workers;
-  } catch(e){ console.error(e); }
+async function fetchExplorer(){
+  try{
+    const data=await fetch('https://explorer.crionic.org/ext/getbasicstats').then(r=>r.json());
+    document.getElementById('explorerData').innerText='Block '+data.blockcount+' | Supply '+data.supply+' | USD '+data.usd;
+  }catch(e){console.error(e);}
 }
 
-async function fetchExplorer() {
-  try {
-    const res = await fetch('https://pool.coin-miners.info/api/currencies');
-    const data = await res.json();
-    const keys = Object.keys(data);
-    document.getElementById('explorerData').innerText = keys.length + ' currencies listed';
-  } catch(e){ console.error(e); }
+async function fetchSummary(){
+  try{
+    const data=await fetch('https://explorer.crionic.org/ext/getsummary').then(r=>r.json());
+    document.getElementById('summary').innerText=
+      'Difficulty '+data.difficulty+' | Hash '+(data.hashrate/1e6).toFixed(2)+' MH/s | Connections '+data.connections+' | Blocks '+data.blockcount;
+  }catch(e){console.error(e);}
 }
 
-// ---------- AUTO REFRESH ----------
-setInterval(fetchNetwork, 1000);
-setInterval(fetchPools, 10000);
-setInterval(fetchExplorer, 10000);
-fetchNetwork(); fetchPools(); fetchExplorer();
+// intervals
+setInterval(fetchNetwork,1000);
+setInterval(fetchMarket,1000);
+setInterval(fetchExplorer,10000);
+setInterval(fetchSummary,10000);
+fetchNetwork();fetchMarket();fetchExplorer();fetchSummary();
 </script>
 </body>
 </html>
