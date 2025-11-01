@@ -40,7 +40,7 @@
       </div>
     </header>
 
-    <div id="status" class="status">Ready. Služby: Covalent (ckey_docs) • CoinGecko • Public RPC.</div>
+    <div id="status" class="status">Ready. Služby: Covalent (proxy) • CoinGecko • Public RPC.</div>
     <div class="grid">
       <div class="card">
         <div class="small">Výsledky sa zobrazia tu po kliknutí na Check</div>
@@ -57,7 +57,6 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.3/dist/ethers.min.js"></script>
   <script>
     const ETH_RPC = 'https://cloudflare-eth.com';
-    const COVALENT = 'https://api.covalenthq.com/v1/eth-mainnet/address/';
     const COINGECKO = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
     const btn = document.getElementById('check');
     const addrInput = document.getElementById('addr');
@@ -68,17 +67,35 @@
       status.innerHTML = busy ? '<span class="spinner"></span>' + msg : msg;
     }
 
-    async function fetchJSON(url){ try{const r = await fetch(url); return await r.json();}catch(e){return null;} }
+    async function fetchJSON(url){ 
+      try{
+        const r = await fetch(url);
+        return await r.json();
+      }catch(e){
+        console.error(e);
+        return null;
+      }
+    }
 
     async function analyze(addr){
       setStatus('Načítavam dáta...', true);
-      const covalentURL = `${COVALENT}${addr}/balances_v2/?key=ckey_docs`;
+
+      // Použitie CORS proxy
+      const covalentURL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(
+        `https://api.covalenthq.com/v1/eth-mainnet/address/${addr}/balances_v2/?key=ckey_docs`
+      );
+
       const data = await fetchJSON(covalentURL);
       const priceData = await fetchJSON(COINGECKO);
-      if(!data || !priceData){ setStatus('Nepodarilo sa načítať údaje.'); return; }
+
+      if(!data || !data.data || !priceData){ 
+        setStatus('Nepodarilo sa načítať údaje (proxy alebo API).'); 
+        return; 
+      }
 
       const items = data.data.items || [];
       const ethPrice = priceData.ethereum.usd;
+
       const provider = new ethers.JsonRpcProvider(ETH_RPC);
       const bal = await provider.getBalance(addr);
       const ethBalance = Number(ethers.formatUnits(bal, 18));
