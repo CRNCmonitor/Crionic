@@ -1,112 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crionic Network Monitor</title>
+<title>⚡ CRIONIC NETWORK MONITOR ⚡</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 body {
   margin: 0;
   font-family: 'Orbitron', sans-serif;
-  background: linear-gradient(180deg,#020202 0%,#040404 100%);
-  color: #00ffcc;
+  background: radial-gradient(circle at top, #050505 0%, #000 100%);
+  color: #9fffe0;
   overflow-x: hidden;
 }
-h2 {
+h1 {
   text-align: center;
-  margin-top: 15px;
   color: #00ffc3;
-  text-shadow: 0 0 20px #00ffc3, 0 0 40px #00ffc3;
+  text-shadow: 0 0 12px #00ffc3;
+  margin: 20px 0;
 }
-.container {
+.grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+  gap: 15px;
   padding: 20px;
 }
 .panel {
-  background: rgba(15,15,15,0.4);
-  border: 1px solid #00ffc3;
-  border-radius: 14px;
+  background: rgba(20, 20, 20, 0.55);
+  border: 1px solid #007a5e;
+  border-radius: 12px;
   padding: 15px;
-  box-shadow: 0 0 15px #00ffc3 inset, 0 0 10px #00ffc3;
-  backdrop-filter: blur(12px);
-  transition: transform 0.3s;
-}
-.panel:hover { transform: scale(1.02); }
-.progress {
-  height: 8px;
-  background: rgba(0,255,195,0.1);
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 5px 0;
-}
-.progress div {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg,#00ffc3,#0066ff);
-  animation: slide 2s infinite linear;
-}
-@keyframes slide {
-  0% {transform: translateX(-100%);}
-  100% {transform: translateX(100%);}
-}
-a.btn, button {
-  display: inline-block;
-  padding: 8px 12px;
-  margin: 5px;
-  color: #00ffc3;
-  background: rgba(0,0,0,0.5);
-  border: 1px solid #00ffc3;
-  border-radius: 8px;
-  text-decoration: none;
+  box-shadow: 0 0 12px #007a5e33 inset;
+  backdrop-filter: blur(10px);
   transition: 0.3s;
 }
-a.btn:hover, button:hover {
-  background: #00ffc3;
-  color: #000;
+.panel:hover { box-shadow: 0 0 20px #00ffc377 inset; }
+h2 { margin-top: 0; color: #00ffc3; font-size: 1.1rem; border-bottom: 1px solid #007a5e33; padding-bottom: 5px; }
+.progress {
+  height: 6px; background: #003326; border-radius: 4px; overflow: hidden; margin: 3px 0;
 }
+.progress div {
+  height: 100%; width: 0; background: linear-gradient(90deg,#00ffc3,#00aaff);
+  transition: width 0.5s;
+}
+a, button {
+  display: inline-block; color: #00ffc3; text-decoration: none; border: 1px solid #00ffc3;
+  border-radius: 6px; padding: 6px 10px; margin: 3px; font-size: 0.9rem; background: transparent;
+  transition: 0.3s;
+}
+a:hover, button:hover { background: #00ffc3; color: #000; }
 footer {
-  text-align: center;
-  margin-top: 25px;
-  color: #777;
-  font-size: 0.9em;
+  text-align: center; font-size: 0.8rem; color: #888; padding: 15px;
+  border-top: 1px solid #007a5e44; margin-top: 25px;
 }
-.lang-flags img {
-  width: 30px;
-  height: 20px;
-  margin: 2px;
-  cursor: pointer;
-  border: 1px solid #00ffc3;
-}
+ul { list-style:none; padding-left: 10px; margin:0; }
+ul li a { color:#9fffe0; }
 </style>
 </head>
 <body>
-<h2>⚡ CRIONIC NETWORK MONITOR ⚡</h2>
-<div class="lang-flags" id="langFlags"></div>
+<h1>⚡ CRIONIC NETWORK MONITOR ⚡</h1>
 
-<div class="container">
+<div class="grid">
   <div class="panel" id="network">
-    <h3>Network</h3>
-    <div>Hashrate: <span id="hashrate">Loading...</span></div>
-    <div class="progress"><div id="hashBar"></div></div>
-    <div>Difficulty: <span id="difficulty">Loading...</span></div>
-    <div class="progress"><div id="diffBar"></div></div>
-    <div>Connections: <span id="connections">Loading...</span></div>
-    <div class="progress"><div id="connBar"></div></div>
-    <div>Blocks: <span id="blocks">Loading...</span></div>
+    <h2>Sieť</h2>
+    <div>Hashrate: <span id="hashrate">Načítavam...</span></div>
+    <div class="progress"><div id="barHash"></div></div>
+    <div>Difficulty: <span id="difficulty">Načítavam...</span></div>
+    <div class="progress"><div id="barDiff"></div></div>
+    <div>Connections: <span id="connections">Načítavam...</span></div>
+    <div class="progress"><div id="barConn"></div></div>
+    <div>Blocks: <span id="blocks">Načítavam...</span></div>
   </div>
 
   <div class="panel" id="market">
-    <h3>Market</h3>
-    <div>Price USD: <span id="price_usd">Loading...</span></div>
-    <div>Price BTC: <span id="price_btc">Loading...</span></div>
-    <div>Money Supply: <span id="supply">Loading...</span></div>
+    <h2>Trh</h2>
+    <div>Price USD: <span id="price_usd">Načítavam...</span></div>
+    <div>Price BTC: <span id="price_btc">Načítavam...</span></div>
+    <div>Money Supply: <span id="supply">Načítavam...</span></div>
   </div>
 
-  <div class="panel" id="pools">
-    <h3>Pools</h3>
+  <div class="panel">
+    <h2>Pooly</h2>
     <ul>
       <li><a href="https://coin-miners.info" target="_blank">Coin-Miners</a></li>
       <li><a href="https://aikapool.com" target="_blank">Aikapool</a></li>
@@ -115,109 +89,90 @@ footer {
     </ul>
   </div>
 
-  <div class="panel" id="explorer">
-    <h3>Explorer API</h3>
-    <div id="explorerData">Loading...</div>
+  <div class="panel">
+    <h2>Explorer API</h2>
+    <div id="explorerData">Načítavam...</div>
   </div>
 
-  <div class="panel" id="downloads">
-    <h3>Downloads</h3>
-    <a class="btn" href="https://github.com/diabaths/Crionic-Coin/releases" target="_blank">Crionic Core Wallet</a><br>
-    <a class="btn" href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">SRB Miner</a>
+  <div class="panel">
+    <h2>Na stiahnutie</h2>
+    <a href="https://github.com/diabaths/Crionic-Coin/releases" target="_blank">Crionic Core Wallet</a><br>
+    <a href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">SRB Miner</a>
   </div>
 
-  <div class="panel" id="links">
-    <h3>Community & Exchanges</h3>
-    <a class="btn" href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a>
-    <a class="btn" href="https://twitter.com/CrionicCoin" target="_blank">Twitter</a>
-    <a class="btn" href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a>
-    <a class="btn" href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex Exchange</a>
+  <div class="panel">
+    <h2>Komunita & Burzy</h2>
+    <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a>
+    <a href="https://twitter.com/CrionicCoin" target="_blank">Twitter</a>
+    <a href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a>
+    <a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex Exchange</a>
   </div>
 
-  <div class="panel" id="stats">
-    <h3>Summary</h3>
-    <div id="summary">Loading...</div>
+  <div class="panel">
+    <h2>Súhrn</h2>
+    <div id="summary">Načítavam...</div>
   </div>
 </div>
 
-<footer>© 2025 Crionic Network Monitor</footer>
+<footer>© 2025 Crionic Network Monitor | ⚡ Created by Crionic Fans ⚡</footer>
 
 <script>
-// ------------------- LANGUAGES -------------------
-const translations = {
-  en: {Network:"Network",Market:"Market",Pools:"Pools",Explorer:"Explorer API",Downloads:"Downloads",Community:"Community & Exchanges",Summary:"Summary",Blocks:"Blocks",Hashrate:"Hashrate",Difficulty:"Difficulty",Connections:"Connections",PriceUSD:"Price USD",PriceBTC:"Price BTC",MoneySupply:"Money Supply"},
-  sk: {Network:"Sieť",Market:"Trh",Pools:"Pooly",Explorer:"Prieskumník",Downloads:"Na stiahnutie",Community:"Komunita & Burzy",Summary:"Súhrn",Blocks:"Bloky",Hashrate:"Výpočtový výkon",Difficulty:"Obtiažnosť",Connections:"Spojenia",PriceUSD:"Cena USD",PriceBTC:"Cena BTC",MoneySupply:"Objem meny"}
-};
-const supportedLangs=['en','sk','de','fr','ru','jp'];
-const langFlags=document.getElementById('langFlags');
-supportedLangs.forEach(l=>{
-  const img=document.createElement('img');
-  img.src=`https://flagcdn.com/24x18/${l}.png`;
-  img.onclick=()=>setLang(l);
-  langFlags.appendChild(img);
-});
-function setLang(l){localStorage.setItem('lang',l);location.reload();}
-let lang=localStorage.getItem('lang')||navigator.language.slice(0,2);
-if(!supportedLangs.includes(lang))lang='en';
-function t(k){return translations[lang][k]||k;}
-// apply translation on UI
-document.querySelectorAll('h3').forEach(el=>{
-  let key=el.textContent.trim();
-  if(translations[lang][key])el.textContent=t(key);
-});
-
-// ------------------- FETCH DATA -------------------
-async function fetchNetwork(){
-  try{
-    const [diff,conn,hash,block]=await Promise.all([
-      fetch('https://explorer.crionic.org/api/getdifficulty').then(r=>r.text()),
-      fetch('https://explorer.crionic.org/api/getconnectioncount').then(r=>r.text()),
-      fetch('https://explorer.crionic.org/api/getnetworkhashps').then(r=>r.text()),
-      fetch('https://explorer.crionic.org/api/getblockcount').then(r=>r.text())
+// --- REFRESH FUNKCIE ---
+async function updateNetwork() {
+  try {
+    const [diff, conn, hash, block] = await Promise.all([
+      fetch("https://explorer.crionic.org/api/getdifficulty").then(r=>r.text()),
+      fetch("https://explorer.crionic.org/api/getconnectioncount").then(r=>r.text()),
+      fetch("https://explorer.crionic.org/api/getnetworkhashps").then(r=>r.text()),
+      fetch("https://explorer.crionic.org/api/getblockcount").then(r=>r.text())
     ]);
-    document.getElementById('hashrate').textContent=(Number(hash)/1e6).toFixed(2)+' MH/s';
-    document.getElementById('difficulty').textContent=Number(diff).toFixed(2);
-    document.getElementById('connections').textContent=conn;
-    document.getElementById('blocks').textContent=block;
-    document.getElementById('hashBar').style.width=(Math.random()*100)+'%';
-    document.getElementById('diffBar').style.width=(Math.random()*100)+'%';
-    document.getElementById('connBar').style.width=(Math.random()*100)+'%';
-  }catch(e){console.error(e);}
+    document.getElementById("difficulty").textContent = Number(diff).toFixed(2);
+    document.getElementById("connections").textContent = conn;
+    document.getElementById("blocks").textContent = block;
+    document.getElementById("hashrate").textContent = (Number(hash)/1e6).toFixed(2) + " MH/s";
+
+    // animované bary
+    document.getElementById("barHash").style.width = (Math.random()*100)+"%";
+    document.getElementById("barDiff").style.width = (Math.random()*100)+"%";
+    document.getElementById("barConn").style.width = (Math.random()*100)+"%";
+  } catch(e) { console.warn("Network API error", e); }
 }
 
-async function fetchMarket(){
-  try{
-    const [price,supply]=await Promise.all([
-      fetch('https://explorer.crionic.org/ext/getcurrentprice').then(r=>r.text()),
-      fetch('https://explorer.crionic.org/ext/getmoneysupply').then(r=>r.text())
+async function updateMarket() {
+  try {
+    const [price, supply] = await Promise.all([
+      fetch("https://explorer.crionic.org/ext/getcurrentprice").then(r=>r.text()),
+      fetch("https://explorer.crionic.org/ext/getmoneysupply").then(r=>r.text())
     ]);
-    document.getElementById('price_usd').textContent='$'+Number(price).toFixed(6);
-    document.getElementById('price_btc').textContent=(Number(price)/70000).toFixed(8)+' BTC';
-    document.getElementById('supply').textContent=parseFloat(supply).toLocaleString();
-  }catch(e){console.error(e);}
+    document.getElementById("price_usd").textContent = "$" + Number(price).toFixed(6);
+    document.getElementById("price_btc").textContent = (Number(price)/70000).toFixed(8) + " BTC";
+    document.getElementById("supply").textContent = parseFloat(supply).toLocaleString();
+  } catch(e) { console.warn("Market API error", e); }
 }
 
-async function fetchExplorer(){
-  try{
-    const data=await fetch('https://explorer.crionic.org/ext/getbasicstats').then(r=>r.json());
-    document.getElementById('explorerData').innerText='Block '+data.blockcount+' | Supply '+data.supply+' | USD '+data.usd;
-  }catch(e){console.error(e);}
+async function updateExplorer() {
+  try {
+    const data = await fetch("https://explorer.crionic.org/ext/getbasicstats").then(r=>r.json());
+    document.getElementById("explorerData").textContent =
+      "Blocks: " + data.blockcount + " | Supply: " + data.supply + " | USD: $" + data.usd;
+  } catch(e) { console.warn("Explorer API error", e); }
 }
 
-async function fetchSummary(){
-  try{
-    const data=await fetch('https://explorer.crionic.org/ext/getsummary').then(r=>r.json());
-    document.getElementById('summary').innerText=
-      'Difficulty '+data.difficulty+' | Hash '+(data.hashrate/1e6).toFixed(2)+' MH/s | Connections '+data.connections+' | Blocks '+data.blockcount;
-  }catch(e){console.error(e);}
+async function updateSummary() {
+  try {
+    const data = await fetch("https://explorer.crionic.org/ext/getsummary").then(r=>r.json());
+    document.getElementById("summary").textContent =
+      "Diff: " + data.difficulty.toFixed(2) + " | Hash: " + (data.hashrate/1e6).toFixed(2) +
+      " MH/s | Conn: " + data.connections + " | Blocks: " + data.blockcount;
+  } catch(e) { console.warn("Summary API error", e); }
 }
 
-// intervals
-setInterval(fetchNetwork,1000);
-setInterval(fetchMarket,1000);
-setInterval(fetchExplorer,10000);
-setInterval(fetchSummary,10000);
-fetchNetwork();fetchMarket();fetchExplorer();fetchSummary();
+// --- INTERVALY ---
+setInterval(updateNetwork, 1000);
+setInterval(updateMarket, 1000);
+setInterval(updateExplorer, 10000);
+setInterval(updateSummary, 10000);
+updateNetwork(); updateMarket(); updateExplorer(); updateSummary();
 </script>
 </body>
 </html>
