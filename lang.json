@@ -1,0 +1,52 @@
+{
+  "en": {
+    "lbl_network": "Network",
+    "lbl_market": "Market",
+    "lbl_pools": "Pools",
+    "lbl_explorer": "Explorer",
+    "lbl_downloads": "Downloads",
+    "lbl_links": "Community & Exchanges",
+    "lbl_summary": "Summary",
+    "lbl_tx": "Latest Transactions"
+  },
+  "sk": {
+    "lbl_network": "Sieť",
+    "lbl_market": "Trh",
+    "lbl_pools": "Pooly",
+    "lbl_explorer": "Prieskumník",
+    "lbl_downloads": "Na stiahnutie",
+    "lbl_links": "Komunita & Burzy",
+    "lbl_summary": "Súhrn",
+    "lbl_tx": "Posledné transakcie"
+  },
+  "de": {
+    "lbl_network": "Netzwerk",
+    "lbl_market": "Markt",
+    "lbl_pools": "Pools",
+    "lbl_explorer": "Explorer",
+    "lbl_downloads": "Downloads",
+    "lbl_links": "Community & Börsen",
+    "lbl_summary": "Übersicht",
+    "lbl_tx": "Letzte Transaktionen"
+  },
+  "ru": {
+    "lbl_network": "Сеть",
+    "lbl_market": "Рынок",
+    "lbl_pools": "Пулы",
+    "lbl_explorer": "Обозреватель",
+    "lbl_downloads": "Загрузки",
+    "lbl_links": "Сообщество и Биржи",
+    "lbl_summary": "Сводка",
+    "lbl_tx": "Последние транзакции"
+  },
+  "jp": {
+    "lbl_network": "ネットワーク",
+    "lbl_market": "市場",
+    "lbl_pools": "プール",
+    "lbl_explorer": "エクスプローラー",
+    "lbl_downloads": "ダウンロード",
+    "lbl_links": "コミュニティと取引所",
+    "lbl_summary": "概要",
+    "lbl_tx": "最新トランザクション"
+  }
+}
