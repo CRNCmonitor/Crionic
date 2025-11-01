@@ -5,136 +5,106 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Crionic Live Dashboard</title>
 <style>
-  :root{
-    --bg:#050608;
-    --panel: rgba(255,255,255,0.04);
-    --glass: rgba(255,255,255,0.03);
-    --neon-a: #00ffd5;
-    --neon-b: #7b61ff;
-    --accent: #7be495;
-    --text: #cfeee8;
-    --muted: #94a3b8;
-  }
+  :root{--bg:#050608;--panel:rgba(255,255,255,0.04);--neon-a:#00ffd5;--neon-b:#7b61ff;--accent:#7be495;--text:#cfeee8;--muted:#94a3b8;}
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;background:linear-gradient(180deg,#030406 0%, #07080b 100%);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:var(--text);-webkit-font-smoothing:antialiased}
-  .wrap{min-height:100vh;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:18px;padding:22px;align-items:stretch}
-  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.04);padding:14px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.6);position:relative;overflow:hidden}
-  h3{font-size:14px;margin-bottom:8px;color:var(--accent);letter-spacing:0.6px}
-  small{color:var(--muted);font-size:12px}
-  .neon-edge{position:absolute;inset:0;pointer-events:none;border-radius:14px;mix-blend-mode:screen;opacity:0.6;background:linear-gradient(120deg, rgba(123,97,255,0.08), rgba(0,255,213,0.06));filter:blur(18px);transform:translateZ(0)}
-  .neon-line{position:absolute;height:3px;left:-40%;right:-40%;top:0;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));animation:slide 6s linear infinite}
-  @keyframes slide{0%{transform:translateX(-10%)}50%{transform:translateX(60%)}100%{transform:translateX(110%)}}
-  .card.big{grid-column:1/3;grid-row:1/3}
-  .card.tall{grid-row:1/3}
-  .card.wide{grid-column:2/4}
-  .grid-small{display:flex;flex-direction:column;gap:10px}
-  .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
-  .row:last-child{border-bottom:0}
-  .value{font-weight:700}
-  .muted{color:var(--muted);font-size:13px}
-  .bar{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden;position:relative}
-  .bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));box-shadow:0 0 18px rgba(123,97,255,0.18),0 0 28px rgba(0,255,213,0.06);transition:width .9s cubic-bezier(.2,.9,.2,1)}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);cursor:pointer;font-weight:600}
-  .btn.small{padding:6px 9px;font-size:13px}
-  .links{display:flex;gap:8px;flex-wrap:wrap}
-  .download{background:linear-gradient(90deg,var(--neon-b),var(--neon-a));color:#04080a;padding:10px 14px;border-radius:10px;font-weight:700}
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
-  .flag{width:26px;height:18px;border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);cursor:pointer;display:inline-block}
-  .indicator{display:flex;gap:8px;align-items:center}
-  .spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.08);border-top-color:var(--neon-a);animation:spin 1s linear infinite;display:inline-block}
+  html,body{height:100%;background:#040506;font-family:Inter,system-ui;color:var(--text)}
+  .wrap{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:18px;padding:22px}
+  .card{background:rgba(255,255,255,0.04);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:14px;position:relative;overflow:hidden}
+  h3{font-size:14px;color:var(--accent);margin-bottom:8px}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.05)}
+  .bar{height:10px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden}
+  .bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));transition:width .8s}
+  .btn{padding:6px 10px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;cursor:pointer;background:rgba(255,255,255,0.05);font-size:12px}
+  .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.08);border-top-color:var(--neon-a);border-radius:50%;animation:spin 1s linear infinite;display:inline-block}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @media(max-width:980px){.wrap{grid-template-columns:1fr;grid-template-rows:repeat(9,auto)}.card.big{grid-column:auto;grid-row:auto}}
-  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:12px}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-  <div style="padding:14px 22px 0 22px">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px">
-      <div style="display:flex;gap:12px;align-items:center">
-        <div style="font-weight:800;font-size:18px;color:var(--neon-a)">Crionic Dashboard</div>
-        <small class="muted">live • futuristický HUD</small>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <div class="indicator">
-          <div id="autoref" class="btn small" title="Auto-refresh status"><span id="autoSpin"></span><span id="lastFetch">—</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div style="padding:14px 22px 0 22px;display:flex;justify-content:space-between;align-items:center;">
+  <div style="font-weight:800;font-size:18px;color:var(--neon-a)">Crionic Dashboard</div>
+  <div><span id="autoSpin"></span><span id="lastFetch">—</span></div>
+</div>
 
-  <main class="wrap" id="grid">
-    <section class="card big" id="networkCard">
-      <div class="neon-edge"></div><div class="neon-line"></div>
-      <div class="topbar"><h3>Network</h3><small class="muted">1 s refresh</small></div>
-      <div class="grid-small">
-        <div class="row"><div><div class="muted">Hashrate</div><div class="value" id="val_hash">—</div></div><div style="width:40%"><div class="bar"><i id="bar_hash"></i></div></div></div>
-        <div class="row"><div><div class="muted">Difficulty</div><div class="value" id="val_diff">—</div></div><div style="width:40%"><div class="bar"><i id="bar_diff"></i></div></div></div>
-        <div class="row"><div><div class="muted">Connections</div><div class="value" id="val_conn">—</div></div><div style="width:40%"><div class="bar"><i id="bar_conn"></i></div></div></div>
-      </div>
-    </section>
+<main class="wrap">
+  <section class="card">
+    <h3>Network</h3>
+    <div class="row"><div>Hashrate</div><div id="val_hash">—</div></div>
+    <div class="bar"><i id="bar_hash"></i></div>
+    <div class="row"><div>Difficulty</div><div id="val_diff">—</div></div>
+    <div class="bar"><i id="bar_diff"></i></div>
+    <div class="row"><div>Connections</div><div id="val_conn">—</div></div>
+    <div class="bar"><i id="bar_conn"></i></div>
+  </section>
 
-    <section class="card" id="marketCard">
-      <div class="neon-line" style="animation-duration:12s"></div>
-      <div class="topbar"><h3>Market</h3><small class="muted">1 s refresh</small></div>
-      <div class="row"><div><div class="muted">CoinPaprika (CRNC)</div><div class="value" id="cp_price">—</div></div></div>
-    </section>
+  <section class="card">
+    <h3>Market</h3>
+    <div class="row"><div>CoinPaprika</div><div id="cp_price">—</div></div>
+  </section>
 
-    <section class="card" id="poolsCard">
-      <div class="neon-line" style="animation-duration:9s"></div>
-      <div class="topbar"><h3>Pools</h3><small class="muted">10 s refresh</small></div>
-      <div class="row"><div class="muted">coin-miners.info</div><div class="value" id="cm_status">—</div></div>
-    </section>
+  <section class="card">
+    <h3>Pools</h3>
+    <div class="row"><div>coin-miners.info</div><div id="cm_status">—</div></div>
+  </section>
 
-    <section class="card wide" id="logCard">
-      <div class="topbar"><h3>Logs</h3><small class="muted">fetch info</small></div>
-      <div id="logArea" style="font-family:monospace;font-size:12px;max-height:300px;overflow:auto;color:var(--muted)">—</div>
-    </section>
-  </main>
-  <footer>Crionic Dashboard • realtime API</footer>
+  <section class="card" style="grid-column:span 3;">
+    <h3>Logs</h3>
+    <pre id="logArea" style="font-family:monospace;font-size:12px;color:var(--muted);max-height:300px;overflow:auto;">—</pre>
+  </section>
+</main>
+
+<footer>Crionic Dashboard • realtime proxy mode</footer>
 
 <script>
-const cfg = {
-  explorerBase: '/proxy?url=https://explorer.crionic.org',
-  poolBase: '/proxy?url=https://pool.coin-miners.info',
-  coinpaprika: '/proxy?url=https://api.coinpaprika.com/v1/tickers/crnc-crionic',
-  intervals: {fast:1000, slow:10000},
-  fetchTimeout:6000
+const cfg={
+  explorerBase:'/proxy?url=https://explorer.crionic.org',
+  poolBase:'/proxy?url=https://pool.coin-miners.info',
+  coinpaprika:'/proxy?url=https://api.coinpaprika.com/v1/tickers/crnc-crionic',
+  fast:1000,slow:10000,timeout:6000
 };
 
-function log(msg){ const el=document.getElementById('logArea'); el.innerText=(new Date()).toISOString()+" "+msg+"\n"+el.innerText;}
-function setBar(id,p){const e=document.getElementById(id);if(e)e.style.width=Math.min(100,Math.max(0,p))+"%";}
-function human(n){if(!n)return"—";let u=["","K","M","G","T"];let i=0;while(n>=1000&&i<u.length-1){n/=1000;i++;}return n.toFixed(2)+u[i];}
-function setFetching(on){const s=document.getElementById("autoSpin"),t=document.getElementById("lastFetch");if(on)s.innerHTML='<span class="spinner"></span>';else{s.innerHTML='';t.textContent=new Date().toLocaleTimeString();}}
+function log(m){const e=document.getElementById('logArea');e.textContent=new Date().toISOString()+" "+m+"\n"+e.textContent;}
+function setBar(id,p){const e=document.getElementById(id);if(e)e.style.width=Math.max(0,Math.min(100,p))+"%";}
+function setSpin(on){const s=document.getElementById("autoSpin"),t=document.getElementById("lastFetch");if(on)s.innerHTML='<span class="spinner"></span>';else{s.innerHTML='';t.textContent=new Date().toLocaleTimeString();}}
+function human(n){if(!n)return'—';let u=['','K','M','G','T'],i=0;while(n>=1000&&i<u.length-1){n/=1000;i++;}return n.toFixed(2)+u[i];}
 
-async function safeFetch(url){const t=setTimeout(()=>controller.abort(),cfg.fetchTimeout);const controller=new AbortController();try{const r=await fetch(url,{signal:controller.signal});clearTimeout(t);return await r.json();}catch(e){throw e;}}
+async function fetchAuto(url){
+  const r=await fetch(url);
+  const type=r.headers.get('content-type')||'';
+  if(type.includes('application/json'))return r.json();
+  const t=await r.text();
+  try{return JSON.parse(t);}catch{return t;}
+}
 
 async function updateFast(){
-  setFetching(true);
+  setSpin(true);
   try{
-    const h=await safeFetch(cfg.explorerBase+'/api/getnetworkhashps');
-    document.getElementById('val_hash').textContent=human(h);setBar('bar_hash',70);
-    const d=await safeFetch(cfg.explorerBase+'/api/getdifficulty');
-    document.getElementById('val_diff').textContent=d;setBar('bar_diff',40);
-    const c=await safeFetch(cfg.explorerBase+'/api/getconnectioncount');
-    document.getElementById('val_conn').textContent=c;setBar('bar_conn',Math.min(100,(c/100)*100));
-    const m=await safeFetch(cfg.coinpaprika);
+    const h=await fetchAuto(cfg.explorerBase+'/api/getnetworkhashps');
+    document.getElementById('val_hash').textContent=human(Number(h));setBar('bar_hash',70);
+    const d=await fetchAuto(cfg.explorerBase+'/api/getdifficulty');
+    document.getElementById('val_diff').textContent=Number(d).toFixed(2);setBar('bar_diff',40);
+    const c=await fetchAuto(cfg.explorerBase+'/api/getconnectioncount');
+    document.getElementById('val_conn').textContent=c;setBar('bar_conn',Math.min(100,(c/200)*100));
+    const m=await fetchAuto(cfg.coinpaprika);
     const p=m?.quotes?.USD?.price||m?.price_usd||0;
-    document.getElementById('cp_price').textContent='$'+p.toFixed(6);
+    document.getElementById('cp_price').textContent=p?'$'+p.toFixed(6):'—';
   }catch(e){log('Fast update: '+e.message);}
-  setFetching(false);
+  setSpin(false);
 }
 
 async function updateSlow(){
   try{
-    const pool=await safeFetch(cfg.poolBase+'/api/status');
+    const pool=await fetchAuto(cfg.poolBase+'/api/status');
     if(pool)document.getElementById('cm_status').textContent='online';
+    else document.getElementById('cm_status').textContent='offline';
   }catch(e){document.getElementById('cm_status').textContent='offline';log('Pool: '+e.message);}
 }
 
 updateFast();updateSlow();
-setInterval(updateFast,cfg.intervals.fast);
-setInterval(updateSlow,cfg.intervals.slow);
-log('dashboard started with proxy mode');
+setInterval(updateFast,cfg.fast);
+setInterval(updateSlow,cfg.slow);
+log('dashboard started with fixed proxy order');
 </script>
 </body>
 </html>
