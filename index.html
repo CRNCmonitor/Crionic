@@ -1,184 +1,108 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ CRIONIC NETWORK MONITOR ⚡</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
-body {
-  margin:0; font-family:'Orbitron',sans-serif;
-  background:#050505; color:#bfffe8;
-}
-h1 { text-align:center; color:#00ffc3; margin:20px 0; text-shadow:0 0 8px #00ffc3; }
-.container {
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:12px; padding:15px;
-}
-.panel {
-  background:#0e0e0e; border:1px solid #00ffc333; border-radius:10px;
-  padding:12px; box-shadow:0 0 8px #00ffc333 inset;
-}
-h2 { color:#00ffc3; margin-top:0; font-size:1rem; }
-a { color:#00ffc3; text-decoration:none; }
-a:hover { text-decoration:underline; }
-#langSelect { text-align:center; margin-bottom:10px; }
-select { background:#000; color:#00ffc3; border:1px solid #00ffc3; border-radius:5px; padding:5px; }
-footer { text-align:center; font-size:0.8rem; color:#777; padding:15px; border-top:1px solid #222; margin-top:20px; }
-.txlist { max-height:180px; overflow:auto; font-size:0.8rem; }
-.txlist div { border-bottom:1px solid #222; padding:3px 0; }
-.indicator {
-  display:inline-block; width:10px; height:10px; border-radius:50%; margin-left:6px;
-  background:red; box-shadow:0 0 4px red; vertical-align:middle;
-}
-.indicator.on { background:lime; box-shadow:0 0 6px lime; }
-</style>
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crionic Network Dashboard - Futurism</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> </head>
 <body>
-<h1>⚡ CRIONIC NETWORK MONITOR ⚡</h1>
 
-<div id="langSelect">
-  <select id="lang">
-    <option value="en">English</option>
-    <option value="sk" selected>Slovensky</option>
-  </select>
-  <span id="statusLed" class="indicator"></span>
-</div>
+    <header class="header-glass-effect">
+        <h1 class="neon-text">CRIONIC NETWORK STATUS</h1>
+        <div id="language-switcher">
+            <button class="flag-button" data-lang="en">🇬🇧</button>
+            <button class="flag-button" data-lang="sk">🇸🇰</button>
+            <button class="flag-button" data-lang="de">🇩🇪</button>
+            </div>
+    </header>
 
-<div class="container">
-  <div class="panel" id="network">
-    <h2 id="lbl_network">Sieť</h2>
-    <div>Hashrate: <span id="hashrate">...</span></div>
-    <div>Difficulty: <span id="difficulty">...</span></div>
-    <div>Connections: <span id="connections">...</span></div>
-    <div>Blocks: <span id="blocks">...</span></div>
-  </div>
+    <main class="container">
+        <section id="network-market-section" class="animated-gradient-panel">
+            <h2 data-lang-key="network_market_title" class="section-title">NETWORK & MARKET DATA</h2>
+            <div class="data-grid">
+                <div class="data-box glass-effect">
+                    <span data-lang-key="hashrate_label">Network Hashrate</span>
+                    <span id="network-hashrate" class="data-value neon-glow-green">Loading...</span>
+                    <div class="progress-indicator"><div id="hashrate-bar" class="progress-bar pulsating"></div></div>
+                </div>
+                <div class="data-box glass-effect">
+                    <span data-lang-key="difficulty_label">Difficulty</span>
+                    <span id="difficulty" class="data-value neon-glow-blue">Loading...</span>
+                    <div class="progress-indicator"><div id="difficulty-bar" class="progress-bar pulsating"></div></div>
+                </div>
+                <div class="data-box glass-effect">
+                    <span data-lang-key="market_price_label">CRNC Price (USD)</span>
+                    <span id="market-price" class="data-value neon-glow-cyan">Loading...</span>
+                </div>
+            </div>
+        </section>
 
-  <div class="panel" id="market">
-    <h2 id="lbl_market">Trh</h2>
-    <div>Price USD: <span id="price_usd">...</span></div>
-    <div>Price BTC: <span id="price_btc">...</span></div>
-    <div>Money Supply: <span id="supply">...</span></div>
-  </div>
+        <hr class="divider neon-divider">
 
-  <div class="panel">
-    <h2 id="lbl_pools">Pooly</h2>
-    <a href="https://coin-miners.info" target="_blank">Coin-Miners</a><br>
-    <a href="https://aikapool.com" target="_blank">Aikapool</a><br>
-    <a href="https://mining4people.com" target="_blank">Mining4People</a><br>
-    <a href="https://zpool.ca" target="_blank">Zpool</a>
-  </div>
+        <section id="pools-explorer-section" class="animated-gradient-panel">
+            <h2 data-lang-key="pools_explorer_title" class="section-title">POOLS & EXPLORER API</h2>
 
-  <div class="panel">
-    <h2 id="lbl_explorer">Prieskumník</h2>
-    <div id="explorerData">...</div>
-  </div>
+            <div class="data-grid">
+                <div class="data-box glass-effect">
+                    <span data-lang-key="block_count_label">Block Count</span>
+                    <span id="block-count" class="data-value neon-glow-yellow">Loading...</span>
+                </div>
+                <div class="data-box glass-effect">
+                    <span data-lang-key="connections_label">Connections</span>
+                    <span id="connections" class="data-value neon-glow-magenta">Loading...</span>
+                    <div class="progress-indicator"><div id="connections-bar" class="progress-bar pulsating"></div></div>
+                </div>
+                </div>
 
-  <div class="panel">
-    <h2 id="lbl_tx">Posledné transakcie</h2>
-    <div class="txlist" id="txList">...</div>
-  </div>
+            <h3 data-lang-key="pools_title" class="subsection-title">Available Pools</h3>
+            <div class="pool-links">
+                <a href="https://coin-miners.info" target="_blank" class="pool-link glass-button neon-glow-green">coin-miners.info</a>
+                <a href="https://aikapool.com" target="_blank" class="pool-link glass-button neon-glow-blue">aikapool.com</a>
+                <a href="https://mining4people.com" target="_blank" class="pool-link glass-button neon-glow-cyan">mining4people.com</a>
+                <a href="https://zpool.ca" target="_blank" class="pool-link glass-button neon-glow-yellow">zpool.ca</a>
+            </div>
+            
+            <h3 data-lang-key="api_docs_title" class="subsection-title">API Documentation</h3>
+            <div class="api-docs-list glass-effect">
+                <p>
+                    <span data-lang-key="api_getdifficulty">getdifficulty:</span> <a href="https://explorer.crionic.org/api/getdifficulty" target="_blank">explorer.crionic.org/api/getdifficulty</a>
+                </p>
+                <p>
+                    <span data-lang-key="api_getblockcount">getblockcount:</span> <a href="https://explorer.crionic.org/api/getblockcount" target="_blank">explorer.crionic.org/api/getblockcount</a>
+                </p>
+                </div>
+        </section>
 
-  <div class="panel">
-    <h2 id="lbl_downloads">Na stiahnutie</h2>
-    <a href="https://github.com/diabaths/Crionic-Coin/releases" target="_blank">Crionic Core Wallet</a><br>
-    <a href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank">SRB Miner</a>
-  </div>
+        <hr class="divider neon-divider">
 
-  <div class="panel">
-    <h2 id="lbl_links">Komunita & Burzy</h2>
-    <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank">Discord</a><br>
-    <a href="https://twitter.com/CrionicCoin" target="_blank">Twitter</a><br>
-    <a href="https://app.komodoplatform.com/wallet/crnc" target="_blank">Komodo Wallet</a><br>
-    <a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank">Nestex Exchange</a>
-  </div>
+        <section id="downloads-social" class="animated-gradient-panel">
+            
+            <h2 data-lang-key="downloads_title" class="section-title">DOWNLOADS & SOCIAL</h2>
+            <div class="button-grid">
+                <a href="https://github.com/diabaths/Crionic-Coin/releases" target="_blank" class="glass-button neon-glow-magenta button-wallet" data-lang-key="wallet_download">Crionic Core Wallet</a>
+                <a href="https://github.com/doktor83/SRBMiner-Multi/releases" target="_blank" class="glass-button neon-glow-green button-miner" data-lang-key="miner_download">SRB Miner</a>
+                <a href="https://app.komodoplatform.com/wallet/crnc" target="_blank" class="glass-button neon-glow-blue button-komodo">Komodo Wallet (CRNC)</a>
+                <a href="https://trade.nestex.one/spot/CRNC_USDT" target="_blank" class="glass-button neon-glow-cyan button-nestex">Nestex Exchange (CRNC/USDT)</a>
+            </div>
 
-  <div class="panel">
-    <h2 id="lbl_summary">Súhrn</h2>
-    <div id="summary">...</div>
-  </div>
-</div>
+            <h3 data-lang-key="social_title" class="subsection-title">Connect with us</h3>
+            <div class="social-links">
+                <a href="https://twitter.com/Crionic_Coin" target="_blank" class="social-link neon-icon neon-glow-blue">Twitter 🐦</a>
+                <a href="https://discord.com/invite/SKDkjcJTKM" target="_blank" class="social-link neon-icon neon-glow-magenta">Discord 💬</a>
+            </div>
+        </section>
+        
+        <hr class="divider neon-divider">
 
-<footer>© 2025 Crionic Network Monitor | ⚡ Created by Crionic Fans ⚡</footer>
-
-<script>
-// preklady
-const tr = {
-  en: {lbl_network:"Network", lbl_market:"Market", lbl_pools:"Pools", lbl_explorer:"Explorer", lbl_tx:"Latest Transactions", lbl_downloads:"Downloads", lbl_links:"Community & Exchanges", lbl_summary:"Summary"},
-  sk: {lbl_network:"Sieť", lbl_market:"Trh", lbl_pools:"Pooly", lbl_explorer:"Prieskumník", lbl_tx:"Posledné transakcie", lbl_downloads:"Na stiahnutie", lbl_links:"Komunita & Burzy", lbl_summary:"Súhrn"}
-};
-function setLang(l){ for(const k in tr[l]){ let el=document.getElementById(k); if(el) el.textContent=tr[l][k]; } localStorage.setItem('lang',l); }
-const langSel=document.getElementById('lang');
-langSel.value=localStorage.getItem('lang')||'sk';
-setLang(langSel.value);
-langSel.onchange=()=>setLang(langSel.value);
-
-// indikátor
-const led=document.getElementById('statusLed');
-let okSince=Date.now();
-function setLed(active){
-  if(active){ led.classList.add('on'); okSince=Date.now(); }
-  else {
-    const diff=Date.now()-okSince;
-    if(diff>6000) led.classList.remove('on');
-  }
-}
-
-// API
-async function fetchJSON(url){ try{const r=await fetch(url);setLed(true);return await r.json();}catch(e){setLed(false);return null;} }
-async function fetchText(url){ try{const r=await fetch(url);setLed(true);return await r.text();}catch(e){setLed(false);return "...";} }
-
-async function updateNetwork(){
-  const diff=await fetchText("https://explorer.crionic.org/api/getdifficulty");
-  const conn=await fetchText("https://explorer.crionic.org/api/getconnectioncount");
-  const hash=await fetchText("https://explorer.crionic.org/api/getnetworkhashps");
-  const block=await fetchText("https://explorer.crionic.org/api/getblockcount");
-  document.getElementById("difficulty").textContent=isNaN(diff)?diff:Number(diff).toFixed(2);
-  document.getElementById("connections").textContent=conn;
-  document.getElementById("blocks").textContent=block;
-  document.getElementById("hashrate").textContent=isNaN(hash)?hash:(Number(hash)/1e6).toFixed(2)+" MH/s";
-}
-
-async function updateMarket(){
-  const price=await fetchText("https://explorer.crionic.org/ext/getcurrentprice");
-  const supply=await fetchText("https://explorer.crionic.org/ext/getmoneysupply");
-  document.getElementById("price_usd").textContent=isNaN(price)?"...":"$"+Number(price).toFixed(6);
-  document.getElementById("price_btc").textContent=isNaN(price)?"...":(Number(price)/70000).toFixed(8)+" BTC";
-  document.getElementById("supply").textContent=isNaN(supply)?"...":Number(supply).toLocaleString();
-}
-
-async function updateExplorer(){
-  const data=await fetchJSON("https://explorer.crionic.org/ext/getbasicstats");
-  if(data && data.blockcount)
-    document.getElementById("explorerData").textContent=`Blocks: ${data.blockcount} | Supply: ${data.supply} | USD: $${data.usd}`;
-}
-
-async function updateSummary(){
-  const data=await fetchJSON("https://explorer.crionic.org/ext/getsummary");
-  if(data && data.difficulty)
-    document.getElementById("summary").textContent=`Diff: ${data.difficulty.toFixed(2)} | Hash: ${(data.hashrate/1e6).toFixed(2)} MH/s | Conn: ${data.connections} | Blocks: ${data.blockcount}`;
-}
-
-async function updateTxs(){
-  const data=await fetchJSON("https://explorer.crionic.org/ext/getlasttxs/1/0/10");
-  const list=document.getElementById("txList");
-  list.innerHTML="";
-  if(data && Array.isArray(data.data)){
-    data.data.forEach(tx=>{
-      const div=document.createElement("div");
-      div.innerHTML=`<a href="https://explorer.crionic.org/tx/${tx.txid}" target="_blank">${tx.txid.slice(0,12)}...</a> | ${tx.value} CRNC`;
-      list.appendChild(div);
-    });
-  } else list.textContent="No data";
-}
-
-// intervaly
-setInterval(updateNetwork,1000);
-setInterval(updateMarket,1000);
-setInterval(updateExplorer,10000);
-setInterval(updateSummary,10000);
-setInterval(updateTxs,10000);
-updateNetwork();updateMarket();updateExplorer();updateSummary();updateTxs();
-</script>
-</body>
+        <footer class="footer-glass-effect">
+            <p id="visitor-counter" data-lang-key="visitors_label">Unique Visitors: 1</p>
+            <div id="refresh-indicator" class="refresh-indicator">
+                <span data-lang-key="refresh_label">Auto-Refresh:</span> 
+                <span id="refresh-status" class="neon-glow-green">ON</span>
+            </div>
+        </footer>
+    </main>
+    
+    <script src="lang.js"></script> </body>
 </html>
