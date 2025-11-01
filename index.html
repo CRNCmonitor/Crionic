@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>⚡ CRIONIC NETWORK MONITOR ⚡</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 body {
   margin:0; font-family:'Orbitron',sans-serif;
-  background:#0a0a0a; color:#aef7de;
+  background:#050505; color:#bfffe8;
 }
-h1 { text-align:center; color:#00ffc3; margin:20px 0; }
+h1 { text-align:center; color:#00ffc3; margin:20px 0; text-shadow:0 0 8px #00ffc3; }
 .container {
   display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
   gap:12px; padding:15px;
 }
 .panel {
-  background:#111; border:1px solid #00ffc333;
-  border-radius:10px; padding:12px;
-  box-shadow:0 0 8px #00ffc333 inset;
+  background:#0e0e0e; border:1px solid #00ffc333; border-radius:10px;
+  padding:12px; box-shadow:0 0 8px #00ffc333 inset;
 }
 h2 { color:#00ffc3; margin-top:0; font-size:1rem; }
 a { color:#00ffc3; text-decoration:none; }
@@ -27,6 +27,11 @@ select { background:#000; color:#00ffc3; border:1px solid #00ffc3; border-radius
 footer { text-align:center; font-size:0.8rem; color:#777; padding:15px; border-top:1px solid #222; margin-top:20px; }
 .txlist { max-height:180px; overflow:auto; font-size:0.8rem; }
 .txlist div { border-bottom:1px solid #222; padding:3px 0; }
+.indicator {
+  display:inline-block; width:10px; height:10px; border-radius:50%; margin-left:6px;
+  background:red; box-shadow:0 0 4px red; vertical-align:middle;
+}
+.indicator.on { background:lime; box-shadow:0 0 6px lime; }
 </style>
 </head>
 <body>
@@ -37,6 +42,7 @@ footer { text-align:center; font-size:0.8rem; color:#777; padding:15px; border-t
     <option value="en">English</option>
     <option value="sk" selected>Slovensky</option>
   </select>
+  <span id="statusLed" class="indicator"></span>
 </div>
 
 <div class="container">
@@ -107,9 +113,20 @@ langSel.value=localStorage.getItem('lang')||'sk';
 setLang(langSel.value);
 langSel.onchange=()=>setLang(langSel.value);
 
+// indikátor
+const led=document.getElementById('statusLed');
+let okSince=Date.now();
+function setLed(active){
+  if(active){ led.classList.add('on'); okSince=Date.now(); }
+  else {
+    const diff=Date.now()-okSince;
+    if(diff>6000) led.classList.remove('on');
+  }
+}
+
 // API
-async function fetchJSON(url){ try{const r=await fetch(url);return await r.json();}catch{return null;} }
-async function fetchText(url){ try{const r=await fetch(url);return await r.text();}catch{return "...";} }
+async function fetchJSON(url){ try{const r=await fetch(url);setLed(true);return await r.json();}catch(e){setLed(false);return null;} }
+async function fetchText(url){ try{const r=await fetch(url);setLed(true);return await r.text();}catch(e){setLed(false);return "...";} }
 
 async function updateNetwork(){
   const diff=await fetchText("https://explorer.crionic.org/api/getdifficulty");
