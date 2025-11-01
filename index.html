@@ -3,139 +3,321 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wallet Watcher — Matrix Style</title>
+  <title>Wallet Watcher — Matrix Pro</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <style>
-    body {margin:0; background:#000; color:#00ff66; font-family: "Courier New", monospace;}
-    h1 {text-align:center; font-size:28px; margin-top:20px; text-shadow:0 0 6px #00ff66;}
-    .container {max-width:800px; margin:0 auto; padding:20px;}
-    .input-area {display:flex; gap:10px; justify-content:center; margin-top:20px;}
-    input {flex:1; padding:10px; background:#020; border:1px solid #0f0; color:#0f0; border-radius:4px;}
-    button {padding:10px 20px; background:#001900; color:#0f0; border:1px solid #0f0; cursor:pointer; border-radius:4px;}
-    button:hover {background:#003000;}
-    .status {text-align:center; margin-top:15px; color:#0f0; font-size:14px;}
-    .card {background:#010; border:1px solid #003300; border-radius:8px; padding:15px; margin-top:20px; box-shadow:0 0 10px rgba(0,255,0,0.2);}
-    table {width:100%; border-collapse:collapse; color:#0f0; margin-top:10px;}
-    th,td {border-bottom:1px solid #003300; padding:8px; text-align:left; font-size:13px;}
-    th {color:#00cc66;}
-    .ref-btns {text-align:center; margin-top:20px;}
-    .ref-btns a {margin:0 10px; padding:8px 18px; border:1px solid #0f0; text-decoration:none; color:#0f0; background:#001900; border-radius:4px;}
-    .ref-btns a:hover {background:#003000;}
-    .spinner {display:inline-block;width:14px;height:14px;border:2px solid rgba(0,255,0,0.2);border-top-color:#00ff66;border-radius:50%;animation:spin 1s linear infinite;margin-right:5px;}
-    @keyframes spin {to{transform:rotate(360deg)}}
+    :root{--bg:#000;--neon:#00ff66;--panel:#021;--muted:#0a3}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--neon);font-family: 'Courier New', monospace}
+    .wrap{max-width:980px;margin:18px auto;padding:18px}
+    header{display:flex;align-items:center;justify-content:space-between}
+    h1{margin:0;font-size:22px;text-shadow:0 0 8px rgba(0,255,102,0.15)}
+    .controls{display:flex;gap:10px;align-items:center}
+    input{background:transparent;border:1px solid rgba(0,255,102,0.08);padding:10px;border-radius:6px;color:var(--neon);min-width:320px}
+    button{background:transparent;border:1px solid rgba(0,255,102,0.18);padding:10px 14px;border-radius:6px;color:var(--neon);cursor:pointer}
+    .status{margin-top:10px;color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:16px;margin-top:16px}
+    .card{background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4));border:1px solid rgba(0,255,102,0.06);padding:12px;border-radius:8px;box-shadow:0 6px 24px rgba(0,255,102,0.03)}
+    .small{font-size:13px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:8px;text-align:left;font-size:13px;border-bottom:1px solid rgba(0,255,102,0.03)}
+    th{color:rgba(0,255,102,0.9)}
+    .badge{display:inline-block;padding:6px 10px;border-radius:6px;background:rgba(0,255,102,0.03);border:1px solid rgba(0,255,102,0.06);font-size:13px}
+    .ref{display:inline-block;margin-right:8px;padding:8px 12px;border-radius:6px;background:transparent;border:1px solid rgba(0,255,102,0.08);color:var(--neon);text-decoration:none}
+    .center{text-align:center}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,255,102,0.12);border-top-color:var(--neon);border-radius:50%;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+    /* responsive */
+    @media(max-width:900px){.grid{grid-template-columns:1fr;}.controls{flex-direction:column;align-items:stretch}input{min-width:unset;width:100%}}
   </style>
 </head>
 <body>
-  <h1>Wallet Watcher</h1>
-  <div class="container">
-    <div class="input-area">
-      <input id="addr" placeholder="Zadaj adresu (ETH / BSC)">
-      <button id="check">Check</button>
+  <div class="wrap">
+    <header>
+      <h1>Wallet Watcher — Matrix Pro</h1>
+      <div class="controls">
+        <input id="addr" placeholder="Vlož ETH adresu... napr. 0x123..." spellcheck="false">
+        <button id="check">Check</button>
+      </div>
+    </header>
+
+    <div id="status" class="status">Ready. Služby: Ethplorer (freekey) • CoinGecko • Public RPC.</div>
+
+    <div class="grid">
+      <div>
+        <div id="overview" class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="small">Address</div>
+              <div id="addr-display" style="font-size:15px;letter-spacing:0.6px">—</div>
+            </div>
+            <div class="center">
+              <div class="small">Wallet Score</div>
+              <div id="score" style="font-size:22px">—</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+            <div class="badge" id="wtype">Type: —</div>
+            <div class="badge" id="whale">Whale: —</div>
+            <div class="badge" id="txcount">Txs: —</div>
+            <div class="badge" id="firsttx">First: —</div>
+            <div class="badge" id="lasttx">Last: —</div>
+          </div>
+
+          <div style="margin-top:12px">
+            <div class="small">Balances</div>
+            <table>
+              <thead><tr><th>Asset</th><th>Amount</th><th>USD ≈</th></tr></thead>
+              <tbody id="balances"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tokens" class="card" style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Top tokens (ETH)</strong></div>
+            <div class="small">Total token value: <span id="token-total">—</span></div>
+          </div>
+          <div id="token-table" style="margin-top:8px">—</div>
+        </div>
+
+        <div id="activity" class="card" style="margin-top:12px">
+          <strong>Activity analysis</strong>
+          <div class="small" style="margin-top:8px">Automaticky vypočítaná štatistika (ak sú dostupné dáta z Ethplorer).</div>
+          <div style="margin-top:8px">
+            <div class="small">Avg tx / month: <span id="avg-month">—</span></div>
+            <div class="small">Active days (last 365): <span id="active-days">—</span></div>
+            <div class="small">Token diversity: <span id="tdiv">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="card center">
+          <div><strong>Visual</strong></div>
+          <canvas id="chart" width="380" height="220"></canvas>
+          <div style="margin-top:10px">
+            <a class="ref" href="https://partner.bydfi.com/register?vipCode=Jg9qYE" target="_blank">BYDFI</a>
+            <a class="ref" href="https://www.bitunix.com/register?vipCode=SATTO" target="_blank">Bitunix</a>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <strong>Quick actions</strong>
+          <div style="margin-top:8px" class="small">(len odkazy — žiadne transakcie)</div>
+          <div style="margin-top:8px">
+            <button id="copy">Copy address</button>
+            <button id="open-etherscan">Open on Etherscan</button>
+            <button id="open-bsc">Open on BscScan</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <strong>Notes</strong>
+          <div class="small" style="margin-top:8px">Tento tool je viewer — nevyžaduje súkromné kľúče. BSC tokeny nie sú parsované (bez API key). Data sa vyžadujú z verejných služieb.</div>
+        </div>
+      </aside>
     </div>
-    <div id="status" class="status">Čaká sa na akciu...</div>
 
-    <div id="results" style="display:none;">
-      <div class="card">
-        <h3>Native Balances</h3>
-        <table>
-          <thead><tr><th>Chain</th><th>Balance</th><th>USD (≈)</th></tr></thead>
-          <tbody id="native-body"></tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <h3>Token Holdings (ETH chain)</h3>
-        <div id="tokens-area">—</div>
-      </div>
-
-      <div class="ref-btns">
-        <a href="https://partner.bydfi.com/register?vipCode=Jg9qYE" target="_blank">Trade on BYDFI</a>
-        <a href="https://www.bitunix.com/register?vipCode=SATTO" target="_blank">Register on Bitunix</a>
-      </div>
-    </div>
+    <footer>Deploy: nahraj tento súbor ako <code>index.html</code> do repo a povol GitHub Pages. Hotovo.</footer>
   </div>
 
+  <!-- libs -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.3/dist/ethers.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
   <script>
+    // Matrix Pro Wallet Watcher - ETH only (no API keys required)
     const ETH_RPC = 'https://cloudflare-eth.com';
-    const BSC_RPC = 'https://bsc-dataseed.binance.org/';
+    const ETHPLORER = 'https://api.ethplorer.io/getAddressInfo/';
+    const COINGECKO = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
 
-    const btn = document.getElementById('check');
     const addrInput = document.getElementById('addr');
+    const btn = document.getElementById('check');
     const status = document.getElementById('status');
-    const results = document.getElementById('results');
-    const nativeBody = document.getElementById('native-body');
-    const tokensArea = document.getElementById('tokens-area');
+    const addrDisplay = document.getElementById('addr-display');
+    const scoreEl = document.getElementById('score');
+    const wtypeEl = document.getElementById('wtype');
+    const whaleEl = document.getElementById('whale');
+    const txcountEl = document.getElementById('txcount');
+    const firsttxEl = document.getElementById('firsttx');
+    const lasttxEl = document.getElementById('lasttx');
+    const balancesEl = document.getElementById('balances');
+    const tokenTable = document.getElementById('token-table');
+    const tokenTotalEl = document.getElementById('token-total');
+    const avgMonthEl = document.getElementById('avg-month');
+    const activeDaysEl = document.getElementById('active-days');
+    const tdivEl = document.getElementById('tdiv');
 
-    function setStatus(text, busy=false){
-      status.innerHTML = busy ? `<span class='spinner'></span>${text}` : text;
+    const copyBtn = document.getElementById('copy');
+    const openEtherscan = document.getElementById('open-etherscan');
+    const openBsc = document.getElementById('open-bsc');
+
+    let chart = null;
+
+    function short(a){return a? a.slice(0,8)+'...'+a.slice(-6): ''}
+    function setStatus(txt, busy=false){ status.innerHTML = busy? `<span class='spinner'></span>${txt}`: txt }
+
+    async function fetchJSON(url){ try{ const r = await fetch(url); return await r.json(); }catch(e){return null} }
+
+    async function getEthBalance(addr){
+      try{
+        const provider = new ethers.JsonRpcProvider(ETH_RPC);
+        const bal = await provider.getBalance(addr);
+        return Number(ethers.formatUnits(bal,18));
+      }catch(e){return null}
     }
 
-    async function fetchJSON(url){
-      try {const r = await fetch(url); return await r.json();} catch(e){return null;}
+    async function getEthplorer(addr){
+      const url = `${ETHPLORER}${addr}?apiKey=freekey`;
+      return await fetchJSON(url);
     }
 
-    async function getNativeBalance(address, chain){
-      try {
-        const provider = new ethers.JsonRpcProvider(chain==='bsc'?BSC_RPC:ETH_RPC);
-        const bal = await provider.getBalance(address);
-        return Number(ethers.formatUnits(bal, 18));
-      } catch(e){return null;}
+    async function getEthPrice(){
+      const j = await fetchJSON(COINGECKO);
+      return j && j.ethereum? j.ethereum.usd : null;
     }
 
-    async function getPrices(){
-      const j = await fetchJSON('https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2Cbinancecoin&vs_currencies=usd');
-      return j ? {eth:j.ethereum.usd, bnb:j.binancecoin.usd} : {eth:null,bnb:null};
+    function parseDate(ts){ if(!ts) return '—'; const d = new Date(ts*1000); return d.toISOString().slice(0,10); }
+
+    function calcScore(data){
+      // score from 0-100 based on size, activity, diversity
+      const usd = data.totalUSD || 0; // larger -> higher
+      const txs = data.countTxs || 0;
+      const tokens = data.tokenCount || 0;
+
+      let s = 20; // base
+      s += Math.min(30, Math.log10(usd+1)*10); // value influence
+      s += Math.min(25, Math.log10(txs+1)*5); // activity
+      s += Math.min(25, tokens*2); // diversity
+      s = Math.round(Math.min(100, s));
+      return s;
     }
 
-    async function getTokens(address){
-      const data = await fetchJSON(`https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`);
-      return data && data.tokens ? data.tokens : [];
+    function detectType(data){
+      const usd = data.totalUSD || 0;
+      const txs = data.countTxs || 0;
+      const tokens = data.tokenCount || 0;
+
+      if(usd>50000) return 'Whale';
+      if(txs>500 && tokens>10) return 'Farmer/Trader';
+      if(txs<10 && usd<1) return 'Dust/Inactive';
+      if(txs<50 && tokens>20) return 'Airdrop hunter';
+      return 'Trader';
     }
 
-    async function display(address){
-      setStatus('Načítavam dáta...', true);
-      results.style.display='none';
-      nativeBody.innerHTML='';
-      tokensArea.innerHTML='—';
+    function renderChart(items){
+      const labels = items.map(i=>i.symbol);
+      const values = items.map(i=>i.usd);
+      if(chart) chart.destroy();
+      const ctx = document.getElementById('chart').getContext('2d');
+      chart = new Chart(ctx, {type:'pie',data:{labels, datasets:[{data:values}]}, options:{plugins:{legend:{labels:{color: '#00ff66'}}}}});
+    }
 
-      const prices = await getPrices();
-      const ethBal = await getNativeBalance(address,'eth');
-      const bscBal = await getNativeBalance(address,'bsc');
+    async function analyze(addr){
+      setStatus('Fetching Ethplorer... (freekey)', true);
+      const ethpl = await getEthplorer(addr);
+      if(!ethpl){ setStatus('Ethplorer nedostupný. Skús neskôr.'); return null; }
 
-      const rows = [];
-      if(ethBal!=null) rows.push(`<tr><td>Ethereum</td><td>${ethBal}</td><td>${(ethBal*prices.eth).toFixed(2)}</td></tr>`);
-      if(bscBal!=null) rows.push(`<tr><td>BSC</td><td>${bscBal}</td><td>${(bscBal*prices.bnb).toFixed(2)}</td></tr>`);
-      nativeBody.innerHTML = rows.join('');
+      setStatus('Fetching ETH balance + price...', true);
+      const [ethBal, price] = await Promise.all([getEthBalance(addr), getEthPrice()]);
 
-      const tokens = await getTokens(address);
-      if(tokens.length){
-        let tHTML = '<table><thead><tr><th>Name</th><th>Symbol</th><th>Balance</th><th>USD</th></tr></thead><tbody>';
-        for(const t of tokens){
-          const info = t.tokenInfo||{};
-          const name = info.name||'Unknown';
-          const sym = info.symbol||'';
-          const dec = info.decimals?Number(info.decimals):0;
-          const bal = dec? (Number(t.balance)/Math.pow(10,dec)): Number(t.balance);
-          const usd = (info.price && info.price.rate)? (bal*info.price.rate).toFixed(2) : '—';
-          tHTML += `<tr><td>${name}</td><td>${sym}</td><td>${bal}</td><td>${usd}</td></tr>`;
-        }
-        tHTML += '</tbody></table>';
-        tokensArea.innerHTML = tHTML;
-      } else {
-        tokensArea.innerHTML = '<div>Žiadne tokeny nenájdené.</div>';
+      // parse tokens
+      const tokens = ethpl.tokens || [];
+      const tokenCount = tokens.length;
+      let tokenTotal = 0;
+      const items = [];
+      for(const t of tokens){
+        const info = t.tokenInfo || {};
+        const decimals = info.decimals? Number(info.decimals) : 0;
+        const raw = Number(t.balance || 0);
+        const balance = decimals? raw / Math.pow(10,decimals) : raw;
+        const usd = (info.price && info.price.rate) ? (balance * info.price.rate) : 0;
+        tokenTotal += usd;
+        items.push({name: info.name||'UNK', symbol: info.symbol||'UNK', balance, usd});
+      }
+      // sort top 5
+      items.sort((a,b)=>b.usd - a.usd);
+      const top = items.slice(0,5);
+
+      // tx stats
+      const countTxs = ethpl.countTxs || (ethpl.transactions? ethpl.transactions.length : 0) || 0;
+      const firstTx = ethpl.firstTx || (ethpl.transactions && ethpl.transactions[0] && ethpl.transactions[0].timestamp) || null;
+      const lastTx = ethpl.lastActivity || ethpl.lastTx || (ethpl.transactions && ethpl.transactions.slice(-1)[0] && ethpl.transactions.slice(-1)[0].timestamp) || null;
+
+      // compute avg tx/month since firstTx
+      let avgMonth = '—';
+      if(firstTx && countTxs){
+        const months = Math.max(1, (Date.now()/1000 - firstTx)/(60*60*24*30));
+        avgMonth = (countTxs / months).toFixed(2);
       }
 
-      results.style.display='block';
+      // token diversity
+      const diversity = tokenCount;
+
+      // total USD
+      const nativeUSD = (ethBal!=null && price!=null)? ethBal*price : 0;
+      const totalUSD = nativeUSD + tokenTotal;
+
+      return {
+        ethBal, price, tokens: items, top, tokenTotal, countTxs, firstTx, lastTx, avgMonth, tokenCount: diversity, totalUSD
+      };
+    }
+
+    async function render(addr){
+      setStatus('Analýza adresy...', true);
+      addrDisplay.textContent = addr;
+      copyBtn.onclick = ()=>{navigator.clipboard.writeText(addr); setStatus('Adresa skopírovaná.');}
+      openEtherscan.onclick = ()=> window.open(`https://etherscan.io/address/${addr}`, '_blank');
+      openBsc.onclick = ()=> window.open(`https://bscscan.com/address/${addr}`, '_blank');
+
+      const data = await analyze(addr);
+      if(!data){ setStatus('Chyba pri získavaní dát.'); return; }
+
+      // balances
+      balancesEl.innerHTML = '';
+      const nativeRow = `<tr><td>ETH</td><td>${data.ethBal!=null?data.ethBal:'—'}</td><td>${data.price? (data.ethBal*data.price).toFixed(2) : '—'}</td></tr>`;
+      balancesEl.innerHTML = nativeRow;
+
+      // tokens table
+      if(data.top.length){
+        let html = '<table><thead><tr><th>Name</th><th>Symbol</th><th>Balance</th><th>USD</th></tr></thead><tbody>';
+        for(const t of data.top){ html += `<tr><td>${t.name}</td><td>${t.symbol}</td><td>${t.balance}</td><td>${t.usd? t.usd.toFixed(2) : '—'}</td></tr>` }
+        html += '</tbody></table>';
+        tokenTable.innerHTML = html;
+      } else tokenTable.innerHTML = '<div class="small">Žiadne tokeny alebo Ethplorer nevrátil ceny.</div>';
+
+      tokenTotalEl.textContent = data.tokenTotal? data.tokenTotal.toFixed(2) : '0.00';
+
+      // activity
+      txcountEl.textContent = `Txs: ${data.countTxs}`;
+      firsttxEl.textContent = `First: ${parseDate(data.firstTx)}`;
+      lasttxEl.textContent = `Last: ${parseDate(data.lastTx)}`;
+      avgMonthEl.textContent = data.avgMonth !== '—' ? data.avgMonth : '—';
+      activeDaysEl.textContent = '—';
+      tdivEl.textContent = data.tokenCount;
+
+      // score + type
+      const meta = {totalUSD: data.totalUSD, countTxs: data.countTxs, tokenCount: data.tokenCount};
+      const score = calcScore(meta);
+      scoreEl.textContent = score;
+      wtypeEl.textContent = 'Type: ' + detectType(meta);
+      whaleEl.textContent = data.totalUSD>10000? 'Yes' : 'No';
+
+      // chart
+      renderChart(data.top.length? data.top : [{symbol:'ETH', usd:(data.ethBal? data.ethBal*data.price:0)}]);
+
       setStatus('Hotovo.');
     }
 
     btn.onclick = ()=>{
       const a = addrInput.value.trim();
-      if(!a){setStatus('Zadaj adresu.');return;}
-      display(a);
+      if(!a){ setStatus('Zadaj ETH adresu.'); return; }
+      render(a);
     }
 
-    addrInput.addEventListener('keyup', e=>{if(e.key==='Enter')btn.click();});
+    addrInput.addEventListener('keyup', e=>{ if(e.key==='Enter') btn.click(); });
   </script>
 </body>
 </html>
