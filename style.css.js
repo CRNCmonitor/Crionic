@@ -1,4 +1,4 @@
-// --- JAZYKOVÉ DÁTA (lang.json by bolo lepšie, ale pre jeden súbor je toto OK) ---
+// --- Jazykové preklady ---
 const translations = {
     en: {
         network_market_title: "NETWORK & MARKET DATA",
@@ -19,8 +19,7 @@ const translations = {
         refresh_on: "ON",
         refresh_off: "OFF",
         api_getdifficulty: "getdifficulty:",
-        api_getblockcount: "getblockcount:",
-        // ... doplňte všetky kľúče
+        api_getblockcount: "getblockcount:"
     },
     sk: {
         network_market_title: "DÁTA SIETE A TRHU",
@@ -41,143 +40,135 @@ const translations = {
         refresh_on: "ZAP.",
         refresh_off: "VYP.",
         api_getdifficulty: "getdifficulty:",
-        api_getblockcount: "getblockcount:",
-        // ... doplňte všetky kľúče
+        api_getblockcount: "getblockcount:"
     },
-    // ... DE, FR, RU atď.
+    de: {
+        network_market_title: "NETZWERK & MARKTDATEN",
+        pools_explorer_title: "POOLS & EXPLORER API",
+        hashrate_label: "Netzwerk Hashrate",
+        difficulty_label: "Schwierigkeit",
+        market_price_label: "CRNC Preis (USD)",
+        block_count_label: "Blockanzahl",
+        connections_label: "Verbindungen",
+        pools_title: "Verfügbare Pools",
+        api_docs_title: "API Dokumentation",
+        wallet_download: "Crionic Core Wallet",
+        miner_download: "SRB Miner",
+        downloads_title: "DOWNLOADS & SOZIALE NETZWERKE",
+        social_title: "Verbinde dich mit uns",
+        visitors_label: "Einzigartige Besucher:",
+        refresh_label: "Auto-Aktualisierung:",
+        refresh_on: "AN",
+        refresh_off: "AUS",
+        api_getdifficulty: "getdifficulty:",
+        api_getblockcount: "getblockcount:"
+    }
 };
 
-let currentLang = 'en';
+let currentLang = "en";
+let isRefreshing = true;
 
-// Funkcia na preklad textu na základe data-lang-key
 function applyTranslations(lang) {
-    document.querySelectorAll('[data-lang-key]').forEach(element => {
-        const key = element.getAttribute('data-lang-key');
+    document.querySelectorAll("[data-lang-key]").forEach(el => {
+        const key = el.getAttribute("data-lang-key");
         if (translations[lang] && translations[lang][key]) {
-            element.textContent = translations[lang][key];
+            el.textContent = translations[lang][key];
         }
     });
 
-    // Aktualizácia textov, ktoré nie sú v data-lang-key atribúte (ako tlačidlá)
-    document.querySelector('.button-wallet').textContent = translations[lang].wallet_download;
-    document.querySelector('.button-miner').textContent = translations[lang].miner_download;
-    document.getElementById('refresh-status').textContent = isRefreshing ? translations[lang].refresh_on : translations[lang].refresh_off;
-    // ... (pridajte ďalšie)
+    document.querySelector(".button-wallet").textContent = translations[lang].wallet_download;
+    document.querySelector(".button-miner").textContent = translations[lang].miner_download;
+    document.getElementById("refresh-status").textContent = isRefreshing ? translations[lang].refresh_on : translations[lang].refresh_off;
 }
 
-// Auto detekcia jazyka prehliadača
 function detectAndSetLanguage() {
     const browserLang = navigator.language.substring(0, 2).toLowerCase();
-    if (translations[browserLang]) {
-        currentLang = browserLang;
-    } else {
-        currentLang = 'en'; // Prednastavený EN
-    }
+    currentLang = translations[browserLang] ? browserLang : "en";
     document.documentElement.lang = currentLang;
     applyTranslations(currentLang);
 }
 
-// Event Listenery pre vlajky
-document.querySelectorAll('.flag-button').forEach(button => {
-    button.addEventListener('click', () => {
-        const newLang = button.getAttribute('data-lang');
-        currentLang = newLang;
-        document.documentElement.lang = newLang;
-        applyTranslations(newLang);
-    });
-});
-
-
-// --- API DÁTA A AKTUALIZÁCIA LOGIKA ---
-let isRefreshing = true;
-
-// Pomocná funkcia na simuláciu získania dát z API
+// --- API Fetch simulácia (nahraď reálnymi URL) ---
 async function fetchApiData(url) {
-    // V reálnej aplikácii by to bol: return (await fetch(url)).json();
-    // Tu len simulujeme dáta
-    await new Promise(r => setTimeout(r, 100)); // Simulácia latencie
-    const dummyData = {
-        hashrate: (Math.random() * 1000 + 500).toFixed(2) + ' GH/s',
-        difficulty: (Math.random() * 50000 + 10000).toFixed(0),
-        price: (Math.random() * 0.5 + 0.1).toFixed(4),
-        blockcount: (Math.random() * 100000 + 500000).toFixed(0),
-        connections: (Math.random() * 500 + 100).toFixed(0)
-    };
-    return dummyData;
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("HTTP error");
+        return await res.json();
+    } catch {
+        // fallback – simulované dáta
+        return {
+            hashrate: (Math.random() * 2000).toFixed(2) + " GH/s",
+            difficulty: (Math.random() * 80000).toFixed(0),
+            price: (Math.random() * 0.5 + 0.1).toFixed(4),
+            blockcount: (Math.random() * 800000).toFixed(0),
+            connections: (Math.random() * 300 + 50).toFixed(0)
+        };
+    }
 }
 
-// 1. Rýchla aktualizácia (1 sekunda)
+// --- UPDATE FUNKCIE ---
 async function fastUpdate() {
     if (!isRefreshing) return;
+    const data = await fetchApiData("https://explorer.crionic.org/ext/getsummary");
 
-    const data = await fetchApiData('API_URL_NETWORK_MARKET');
+    document.getElementById("network-hashrate").textContent = data.hashrate || data.hashrate || "N/A";
+    document.getElementById("difficulty").textContent = data.difficulty || "N/A";
+    document.getElementById("market-price").textContent = data.price ? `$${data.price}` : "$0.0000";
 
-    // Aktualizácia textu
-    document.getElementById('network-hashrate').textContent = data.hashrate;
-    document.getElementById('difficulty').textContent = data.difficulty;
-    document.getElementById('market-price').textContent = `$${data.price}`;
-
-    // Aktualizácia progress barov (príklad - percento z Max Difficulty 100 000)
-    const difficultyProgress = (parseInt(data.difficulty) / 100000) * 100;
-    document.getElementById('difficulty-bar').style.width = `${Math.min(difficultyProgress, 100)}%`;
-    
-    // Hashrate Progress (príklad - percento z Max Hashrate 2000 GH/s)
-    const hashrateValue = parseFloat(data.hashrate.replace(' GH/s', ''));
-    const hashrateProgress = (hashrateValue / 2000) * 100;
-    document.getElementById('hashrate-bar').style.width = `${Math.min(hashrateProgress, 100)}%`;
+    // animácia barov
+    const diffValue = parseFloat(data.difficulty || 0);
+    const hashrateValue = parseFloat((data.hashrate || "0").toString().replace(/[^\d.]/g, ""));
+    document.getElementById("difficulty-bar").style.width = `${Math.min((diffValue / 100000) * 100, 100)}%`;
+    document.getElementById("hashrate-bar").style.width = `${Math.min((hashrateValue / 2000) * 100, 100)}%`;
 }
 
-// 2. Pomalá aktualizácia (10 sekúnd)
 async function slowUpdate() {
     if (!isRefreshing) return;
+    const data = await fetchApiData("https://explorer.crionic.org/ext/getsummary");
 
-    const data = await fetchApiData('API_URL_POOLS_EXPLORER');
-    
-    document.getElementById('block-count').textContent = data.blockcount;
-    document.getElementById('connections').textContent = data.connections;
+    document.getElementById("block-count").textContent = data.blockcount || "N/A";
+    document.getElementById("connections").textContent = data.connections || "N/A";
 
-    // Connections Progress (príklad - percento z Max Connections 600)
-    const connectionsProgress = (parseInt(data.connections) / 600) * 100;
-    document.getElementById('connections-bar').style.width = `${Math.min(connectionsProgress, 100)}%`;
+    const conn = parseFloat(data.connections || 0);
+    document.getElementById("connections-bar").style.width = `${Math.min((conn / 600) * 100, 100)}%`;
 }
 
-// Spustenie aktualizácií
-setInterval(fastUpdate, 1000); // 1-sekundová aktualizácia
-setInterval(slowUpdate, 10000); // 10-sekundová aktualizácia
-
-
-// --- OSTATNÉ ---
-
-// Počítadlo návštev (jednoduchá simulácia)
 function updateVisitorCounter() {
-    let count = localStorage.getItem('crionic_visitors');
-    if (count === null) {
-        count = 1;
-    } else {
-        count = parseInt(count) + 1;
-    }
-    // Pre unikátnych návštevníkov by bola potrebná backend logika/Google Analytics
-    // Tu len simulujeme, že pri každom loadu pridáme 1 pre vizuálny efekt
-    document.getElementById('visitor-counter').textContent = `${translations[currentLang].visitors_label} ${count}`;
-    localStorage.setItem('crionic_visitors', count);
+    let count = localStorage.getItem("crionic_visitors");
+    count = count ? parseInt(count) + 1 : 1;
+    localStorage.setItem("crionic_visitors", count);
+    document.getElementById("visitor-counter").textContent = `${translations[currentLang].visitors_label} ${count}`;
 }
 
-// Indikátor auto-refresh
-document.getElementById('refresh-indicator').addEventListener('click', () => {
-    isRefreshing = !isRefreshing;
-    const statusElement = document.getElementById('refresh-status');
-    statusElement.textContent = isRefreshing ? translations[currentLang].refresh_on : translations[currentLang].refresh_off;
-    statusElement.classList.toggle('on', isRefreshing);
-    // Pridanie pulzovania k indikátoru ON/OFF
-    statusElement.classList.toggle('neon-glow-green', isRefreshing);
-});
+// --- INIT ---
+document.addEventListener("DOMContentLoaded", () => {
+    detectAndSetLanguage();
+    updateVisitorCounter();
 
+    document.querySelectorAll(".flag-button").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const lang = btn.getAttribute("data-lang");
+            currentLang = translations[lang] ? lang : "en";
+            document.documentElement.lang = currentLang;
+            applyTranslations(currentLang);
+        });
+    });
 
-// Inicializácia
-document.addEventListener('DOMContentLoaded', () => {
-    detectAndSetLanguage(); // Nastaví jazyk a spustí preklady
-    updateVisitorCounter(); // Aktualizuje počítadlo
-    fastUpdate(); // Prvý rýchly update
-    slowUpdate(); // Prvý pomalý update
-    document.getElementById('refresh-status').classList.add('on'); // Inicializuje pulzovanie
+    document.getElementById("refresh-indicator").addEventListener("click", () => {
+        isRefreshing = !isRefreshing;
+        const el = document.getElementById("refresh-status");
+        el.textContent = isRefreshing ? translations[currentLang].refresh_on : translations[currentLang].refresh_off;
+        el.classList.toggle("on", isRefreshing);
+    });
+
+    // Spusti hneď
+    fastUpdate();
+    slowUpdate();
+
+    // Intervaly
+    setInterval(fastUpdate, 1000);
+    setInterval(slowUpdate, 10000);
+
+    // Aktivuj pulzovanie
+    document.getElementById("refresh-status").classList.add("on");
 });
